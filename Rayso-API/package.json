@@ -1,0 +1,33 @@
+{
+  "name": "rayso-api",
+  "version": "1.0.1",
+  "description": "Provides ray.so as a REST API version. Make beautiful and prettified code screenshots by just sending a POST or GET request.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "heroku-postbuild": "mkdir ./.cache && mv /app/.cache/puppeteer ./.cache"
+  },
+  "author": "akashrchandran <chandranrakash@gmail.com>",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.1",
+    "rayso": "^1.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akashrchandran/Rayso-API.git"
+  },
+  "keywords": [
+    "code",
+    "code-screenshot",
+    "node",
+    "api",
+    "express"
+  ],
+  "bugs": {
+    "url": "https://github.com/akashrchandran/Rayso-API/issues"
+  },
+  "homepage": "https://github.com/akashrchandran/Rayso-API#readme"
+}

@@ -1,0 +1,2393 @@
+# 1. Introdução ao JavaScript
+
+## O que é JavaScript?
+
+JavaScript (frequentemente abreviado como JS) é uma linguagem de programação **interpretada**, **leve** e **orientada a objetos** com **funções de primeira classe**. É mais conhecida como a linguagem de script para páginas Web, mas também é usada em muitos ambientes fora dos navegadores, como servidores (Node.js), aplicativos móveis e muito mais.
+
+Ao contrário de HTML (que estrutura o conteúdo) e CSS (que estiliza o conteúdo), JavaScript permite adicionar **interatividade**, **dinamismo** e **lógica** às suas páginas web.
+
+## Diferença entre JavaScript, HTML e CSS
+
+Podemos usar uma analogia com a construção de uma casa:
+
+*   **HTML (HyperText Markup Language):** É a **estrutura** da casa – as paredes, o telhado, as portas, as janelas. Define os elementos e o conteúdo da página.
+*   **CSS (Cascading Style Sheets):** É a **decoração** e a **aparência** da casa – as cores das paredes, os tipos de móveis, o estilo das janelas. Define como os elementos HTML devem ser visualmente apresentados.
+*   **JavaScript:** É a **funcionalidade** e a **interatividade** da casa – acender as luzes, abrir/fechar portas automaticamente, ligar o aquecimento quando a temperatura cai. Permite manipular o HTML e o CSS, responder a ações do usuário, fazer requisições de dados, e muito mais.
+
+Os três trabalham juntos para criar experiências web completas.
+
+## Aplicabilidades do JavaScript no desenvolvimento web
+
+No contexto do desenvolvimento web (front-end), o JavaScript é usado para:
+
+*   **Manipulação do DOM (Document Object Model):** Alterar o conteúdo HTML e os estilos CSS de uma página *depois* que ela foi carregada (ex: mostrar/esconder elementos, atualizar texto).
+*   **Validação de Formulários:** Verificar se os dados inseridos pelo usuário em um formulário são válidos *antes* de enviá-los ao servidor.
+*   **Requisições Assíncronas (AJAX/Fetch):** Buscar ou enviar dados para um servidor em segundo plano, sem precisar recarregar a página inteira (ex: carregar novos posts em uma rede social, verificar a disponibilidade de um nome de usuário).
+*   **Animações e Efeitos Visuais:** Criar animações complexas ou efeitos que vão além do que o CSS pode fazer facilmente.
+*   **Interatividade:** Responder a eventos do usuário como cliques, movimentos do mouse, teclas pressionadas.
+*   **Web APIs:** Interagir com recursos do navegador como geolocalização, armazenamento local, áudio/vídeo.
+*   **Single Page Applications (SPAs):** Frameworks como React, Vue e Angular usam JavaScript extensivamente para criar aplicações web complexas que rodam em uma única página HTML.
+
+## Execução no navegador vs. no servidor (Node.js)
+
+*   **Navegador (Client-Side):** Este é o ambiente mais tradicional para JS. Cada navegador moderno (Chrome, Firefox, Safari, Edge) possui um "motor" JavaScript embutido que executa o código JS contido nas páginas web. Esse código interage diretamente com o DOM e as APIs do navegador.
+*   **Servidor (Server-Side com Node.js):** Node.js é um ambiente de execução que permite rodar JavaScript fora do navegador, tipicamente em servidores. Com Node.js, você pode usar JavaScript para construir back-ends de aplicações web, APIs, ferramentas de linha de comando, etc. No Node.js, você *não* tem acesso direto ao DOM ou às APIs do navegador (como `document` ou `window`), mas tem acesso a funcionalidades do sistema operacional (como manipulação de arquivos) e a um vasto ecossistema de módulos (via npm).
+
+Nesta apostila, focaremos principalmente no JavaScript executado no **navegador**.
+
+# 2. Como Adicionar JavaScript ao Projeto
+
+Existem algumas maneiras de incluir código JavaScript em uma página HTML.
+
+## Script inline (`<script>` dentro do HTML)
+
+Você pode escrever JavaScript diretamente dentro da tag `<script>` no seu arquivo HTML.
+
+[CODE_BLOCK lang="html" title="inline_script.html"]
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Script Inline</title>
+</head>
+<body>
+    <h1>Exemplo de Script Inline</h1>
+    <button onclick="alert('Você clicou!');">Clique Aqui</button>
+
+    <script>
+        // Código JavaScript diretamente no HTML
+        console.log("Script inline executado!");
+        let dataAtual = new Date();
+        console.log("Data:", dataAtual.toLocaleDateString());
+
+        // Função definida inline
+        function mostrarMensagem() {
+            const elemento = document.getElementById('mensagem');
+            if (elemento) {
+                elemento.innerText = 'Olá do JavaScript Inline!';
+            }
+        }
+        // Chamando a função após um tempo
+        // setTimeout(mostrarMensagem, 2000); // Executa após 2 segundos
+    </script>
+
+    <p id="mensagem"></p>
+
+    <!-- É comum colocar scripts que manipulam o DOM no final do body -->
+    <script>
+       // Este script executa depois que o <p id="mensagem"> existe
+       mostrarMensagem();
+    </script>
+</body>
+</html>
+[/CODE_BLOCK]
+
+**Desvantagens:** Mistura lógica com estrutura, difícil de manter e reutilizar, não aproveita o cache do navegador. Geralmente **não recomendado** para mais do que algumas poucas linhas de código simples.
+
+## Arquivos externos (`.js`)
+
+Esta é a forma **recomendada** e mais comum. Você escreve seu código JavaScript em um arquivo separado com a extensão `.js` e o vincula ao seu HTML usando a tag `<script>` com o atributo `src`.
+
+**1. Crie o arquivo JavaScript (ex: `meu_script.js`):**
+
+[CODE_BLOCK lang="javascript" title="meu_script.js"]
+// meu_script.js
+console.log("Script externo carregado!");
+
+function alterarTextoParagrafo() {
+  const paragrafo = document.getElementById('paragrafo-principal');
+  if (paragrafo) {
+    paragrafo.innerText = 'Texto alterado pelo script externo!';
+    paragrafo.style.color = 'blue'; // Altera também o estilo
+  } else {
+    console.error('Elemento com ID "paragrafo-principal" não encontrado!');
+  }
+}
+
+// Adiciona um listener para executar a função quando o HTML estiver pronto
+// (Alternativa a colocar o script no final do body ou usar defer)
+// document.addEventListener('DOMContentLoaded', alterarTextoParagrafo);
+
+// Ou, se o script for carregado no final do body ou com defer,
+// podemos chamar diretamente (se o elemento já existir)
+// Para garantir, vamos esperar o DOM carregar ou usar defer
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM completamente carregado e parseado');
+    alterarTextoParagrafo(); // Chama a função agora
+
+    const botao = document.getElementById('meuBotao');
+    if(botao) {
+        botao.addEventListener('click', () => {
+            alert('Botão externo clicado!');
+        });
+    }
+});
+[/CODE_BLOCK]
+
+**2. Vincule ao HTML:**
+
+[CODE_BLOCK lang="html" title="external_script.html"]
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Script Externo</title>
+    <!-- É comum colocar o script no final do body ou usar 'defer' -->
+    <!-- <script src="meu_script.js" defer></script> -->
+</head>
+<body>
+    <h1>Exemplo de Script Externo</h1>
+    <p id="paragrafo-principal">Este é o texto original.</p>
+    <button id="meuBotao">Clique (Externo)</button>
+
+    <!-- Colocar o script aqui garante que os elementos acima já existem -->
+    <!-- O atributo 'defer' no head teria efeito semelhante -->
+    <script src="meu_script.js"></script>
+</body>
+</html>
+[/CODE_BLOCK]
+
+**Vantagens:** Separação de responsabilidades (HTML estrutura, JS lógica), código mais organizado e reutilizável, aproveita o cache do navegador (o `.js` só é baixado uma vez).
+
+## Diferença entre `defer` e `async`
+
+Quando usamos `<script src="arquivo.js">` dentro do `<head>`, o navegador pausa a análise do HTML para baixar e executar o script. Isso pode atrasar a exibição da página. Os atributos `async` e `defer` modificam esse comportamento:
+
+*   **`async`**: `<script src="arquivo.js" async></script>`
+    *   O script é baixado **assincronamente** (não bloqueia a análise do HTML).
+    *   Ele é executado **assim que o download termina**, o que pode acontecer *antes* do HTML ser completamente analisado. Isso pode causar erros se o script tentar acessar elementos do DOM que ainda não existem.
+    *   A ordem de execução de múltiplos scripts `async` não é garantida. Útil para scripts independentes que não dependem do DOM ou de outros scripts (ex: analytics).
+*   **`defer`**: `<script src="arquivo.js" defer></script>`
+    *   O script é baixado **assincronamente** (não bloqueia a análise do HTML).
+    *   Ele é executado **somente após** o HTML ser completamente analisado, mas *antes* do evento `DOMContentLoaded`.
+    *   A ordem de execução de múltiplos scripts `defer` é geralmente mantida na ordem em que aparecem no HTML.
+    *   **É o atributo recomendado** para a maioria dos scripts externos que precisam interagir com o DOM, quando colocados no `<head>`.
+
+**Alternativa:** Colocar a tag `<script src="arquivo.js"></script>` (sem `async` ou `defer`) bem no final do `<body>`, pouco antes de `</body>`. Nesse ponto, o DOM já terá sido analisado, e o script poderá acessar os elementos.
+
+## Console do navegador e depuração com `console.log`
+
+O **console** é uma ferramenta essencial no desenvolvimento JavaScript, disponível nas Ferramentas de Desenvolvedor (DevTools) de todos os navegadores modernos (geralmente acessível pressionando `F12`).
+
+*   **Exibe Erros:** Erros de sintaxe ou de execução no seu JavaScript são mostrados no console.
+*   **`console.log()`:** A função mais usada para depuração. Permite exibir mensagens, valores de variáveis ou objetos no console para entender o que está acontecendo no código.
+
+[CODE_BLOCK lang="javascript" title="console_log.js"]
+let nomeUsuario = "Alice";
+const idade = 30;
+let usuarioAtivo = true;
+const configuracoes = { tema: 'dark', notificacoes: true };
+
+console.log("Iniciando o script..."); // Mensagem simples
+console.log("Nome do Usuário:", nomeUsuario); // Exibe texto e variável
+console.log("Idade:", idade, "Status Ativo:", usuarioAtivo); // Múltiplos valores
+console.log("Configurações:", configuracoes); // Exibe objetos (interativos no console)
+
+idade = 31; // Erro! Não pode reatribuir const (será mostrado no console)
+// usuarioAtivo = "sim"; // Pode causar erros lógicos se o código esperar um boolean
+
+function calcularArea(largura, altura) {
+    console.log(`Calculando área para ${largura}x${altura}`);
+    if (largura <= 0 || altura <= 0) {
+        console.warn("Largura ou altura inválida!"); // Mensagem de aviso
+        return 0;
+    }
+    let area = largura * altura;
+    console.log("Área calculada:", area);
+    return area;
+}
+
+calcularArea(10, 5);
+calcularArea(-5, 8);
+
+console.error("Ocorreu um erro simulado!"); // Mensagem de erro
+[/CODE_BLOCK]
+
+Abra o HTML que carrega este script e inspecione o Console nas DevTools para ver as mensagens, avisos e erros.
+
+# 3. Variáveis e Tipos de Dados
+
+Variáveis são usadas para armazenar dados que podem ser referenciados e manipulados no código. JavaScript possui diferentes formas de declarar variáveis e vários tipos de dados.
+
+## `var`, `let` e `const`
+
+Estas são as palavras-chave usadas para declarar variáveis:
+
+*   **`var`**:
+    *   A forma mais antiga de declarar variáveis.
+    *   Possui escopo de **função** (ou global se fora de função).
+    *   Sofre de *hoisting* (a declaração é "movida" para o topo do escopo, mas a inicialização não), o que pode levar a comportamentos inesperados.
+    *   Pode ser redeclarada e reatribuída.
+    *   **Uso moderno:** Geralmente **evitado** em favor de `let` e `const`.
+
+*   **`let`**:
+    *   Introduzido no ES6 (ECMAScript 2015).
+    *   Possui escopo de **bloco** (`{ ... }`). Variáveis declaradas dentro de um `if`, `for`, ou bloco `{}` só existem ali dentro.
+    *   Não sofre hoisting da mesma forma que `var` (acessá-la antes da declaração causa um erro).
+    *   Pode ser **reatribuída**, mas não **redeclarada** no mesmo escopo.
+    *   Use `let` quando você *precisar* reatribuir o valor da variável.
+
+*   **`const`**:
+    *   Introduzido no ES6.
+    *   Possui escopo de **bloco** (`{ ... }`).
+    *   Deve ser **inicializada** na declaração.
+    *   **Não pode ser reatribuída**.
+    *   **Importante:** Para objetos e arrays declarados com `const`, a *referência* é constante, mas o *conteúdo* interno (propriedades do objeto ou elementos do array) *pode* ser modificado.
+    *   **Uso moderno:** É a **forma preferida** de declarar variáveis. Use `const` por padrão, a menos que você saiba que precisará reatribuir a variável (nesse caso, use `let`).
+
+[CODE_BLOCK lang="javascript" title="var_let_const.js"]
+// var (EVITAR)
+var nomeAntigo = "Carlos";
+var nomeAntigo = "Daniel"; // Redeclaração permitida
+nomeAntigo = "Eduardo";    // Reatribuição permitida
+console.log("var:", nomeAntigo);
+
+if (true) {
+  var dentroDoIfVar = "Visível fora";
+}
+console.log("var fora do if:", dentroDoIfVar); // Funciona (escopo de função)
+
+// let
+let idadeLet = 25;
+// let idadeLet = 26; // Erro: 'idadeLet' has already been declared
+idadeLet = 27; // Reatribuição permitida
+console.log("let:", idadeLet);
+
+if (true) {
+  let dentroDoIfLet = "Não visível fora";
+  console.log("let dentro do if:", dentroDoIfLet);
+}
+// console.log(dentroDoIfLet); // Erro: dentroDoIfLet is not defined (escopo de bloco)
+
+// const
+const PI = 3.14159;
+// PI = 3.14; // Erro: Assignment to constant variable.
+// const PI = 3.14; // Erro: 'PI' has already been declared
+console.log("const:", PI);
+
+const meuObjeto = { nome: "Ana" };
+meuObjeto.nome = "Beatriz"; // Permitido! Modificando o *conteúdo* do objeto
+meuObjeto.idade = 30;   // Permitido! Adicionando propriedade
+console.log("const objeto:", meuObjeto);
+// meuObjeto = { nome: "Carla" }; // Erro: Assignment to constant variable (reatribuição da referência)
+
+const meuArray = [1, 2, 3];
+meuArray.push(4); // Permitido! Modificando o *conteúdo* do array
+console.log("const array:", meuArray);
+// meuArray = [5, 6]; // Erro: Assignment to constant variable (reatribuição da referência)
+[/CODE_BLOCK]
+
+## Tipos primitivos: `string`, `number`, `boolean`, `null`, `undefined`
+
+Estes são os tipos de dados fundamentais e imutáveis em JavaScript:
+
+*   **`string`**: Representa texto. Envolvido por aspas simples (`' '`), duplas (`" "`) ou crases (`` ` `` - template literals).
+    *   Ex: `"Olá, mundo!"`, `'JavaScript'`, `` `Idade: ${idadeLet}` ``
+*   **`number`**: Representa números, tanto inteiros quanto de ponto flutuante (decimais). Inclui valores especiais como `Infinity`, `-Infinity` e `NaN` (Not a Number).
+    *   Ex: `10`, `3.14`, `-5`, `1.5e3` (1500), `NaN`
+*   **`boolean`**: Representa um valor lógico: `true` ou `false`.
+    *   Ex: `true`, `false`
+*   **`null`**: Representa a ausência intencional de um valor de objeto. É atribuído explicitamente.
+    *   Ex: `let selecionado = null;`
+*   **`undefined`**: Representa uma variável que foi declarada, mas ainda não teve um valor atribuído, ou a ausência de um valor onde um era esperado (ex: acessar propriedade inexistente de objeto, função sem return).
+    *   Ex: `let semValor;` (seu valor é `undefined`)
+*   **`symbol`** (ES6): Representa um identificador único e imutável, usado principalmente como chaves de propriedades de objetos para evitar colisões.
+    *   Ex: `const idUnico = Symbol('descricao');`
+*   **`bigint`** (ES2020): Representa números inteiros arbitrariamente grandes, além do limite seguro de `number`. Criado adicionando `n` ao final do número.
+    *   Ex: `9007199254740991n`, `const outroBigInt = BigInt(123);`
+
+O operador `typeof` pode ser usado para verificar o tipo de uma variável (com algumas peculiaridades, como `typeof null` retornando `"object"`).
+
+[CODE_BLOCK lang="javascript" title="primitive_types.js"]
+let texto = "JavaScript";
+let numeroInteiro = 100;
+let numeroDecimal = 99.9;
+let ativo = true;
+let nada = null;
+let indefinido; // Valor é undefined por padrão
+const id = Symbol('id_unico');
+const numeroGrande = 12345678901234567890n;
+
+console.log(`Tipo de texto: ${typeof texto}`); // "string"
+console.log(`Tipo de numeroInteiro: ${typeof numeroInteiro}`); // "number"
+console.log(`Tipo de numeroDecimal: ${typeof numeroDecimal}`); // "number"
+console.log(`Tipo de ativo: ${typeof ativo}`); // "boolean"
+console.log(`Tipo de nada: ${typeof nada}`); // "object" (peculiaridade histórica)
+console.log(`Tipo de indefinido: ${typeof indefinido}`); // "undefined"
+console.log(`Tipo de id: ${typeof id}`); // "symbol"
+console.log(`Tipo de numeroGrande: ${typeof numeroGrande}`); // "bigint"
+
+console.log(`NaN é um número? ${typeof NaN}`); // "number"
+console.log(`Infinity é um número? ${typeof Infinity}`); // "number"
+[/CODE_BLOCK]
+
+## Tipos de referência: `object`, `array`, `function`
+
+Estes tipos armazenam referências (endereços de memória) para os dados, em vez dos dados em si. São mutáveis.
+
+*   **`object`**: Representa uma coleção de pares chave-valor (propriedades). As chaves são geralmente strings (ou Symbols) e os valores podem ser de qualquer tipo.
+    *   Ex: `let pessoa = { nome: "Maria", idade: 28, cidade: "Recife" };`
+*   **`array`**: Representa uma lista ordenada de valores. Os valores podem ser de qualquer tipo e são acessados por um índice numérico (começando em 0). Arrays em JS são, na verdade, um tipo especial de objeto.
+    *   Ex: `let numeros = [10, 20, 30];`, `let misto = ["texto", 5, true, null];`
+*   **`function`**: Embora possamos pensar nelas como blocos de código, funções em JavaScript são também objetos (de primeira classe), o que significa que podem ser atribuídas a variáveis, passadas como argumentos e retornadas por outras funções.
+    *   Ex: `function soma(a, b) { return a + b; }`, `const multiplica = function(a, b) { return a * b; };`, `const divide = (a, b) => a / b;`
+
+[CODE_BLOCK lang="javascript" title="reference_types.js"]
+// Objeto
+let carro = {
+  marca: "Toyota",
+  modelo: "Corolla",
+  ano: 2023,
+  ligado: false,
+  ligar: function() { // Função como propriedade (método)
+    this.ligado = true;
+    console.log("Carro ligado!");
+  }
+};
+console.log("Objeto carro:", carro);
+console.log("Modelo:", carro.modelo); // Acesso com ponto
+console.log("Ano:", carro['ano']); // Acesso com colchetes
+carro.ligar();
+console.log("Tipo de carro:", typeof carro); // "object"
+
+// Array
+let frutas = ["Maçã", "Banana", "Laranja"];
+console.log("Array frutas:", frutas);
+console.log("Primeira fruta:", frutas[0]);
+frutas.push("Uva"); // Adiciona no final
+console.log("Frutas após push:", frutas);
+console.log("Tipo de frutas:", typeof frutas); // "object" (Arrays são objetos especiais)
+console.log("É um array?", Array.isArray(frutas)); // true
+
+// Função
+function subtrair(x, y) {
+  return x - y;
+}
+const resultadoSub = subtrair(10, 4);
+console.log("Resultado subtração:", resultadoSub);
+console.log("Tipo de subtrair:", typeof subtrair); // "function"
+[/CODE_BLOCK]
+
+## Conversão de tipos (`parseInt`, `parseFloat`, `toString`)
+
+JavaScript frequentemente realiza conversão automática de tipos (coerção), mas isso pode levar a resultados inesperados. É muitas vezes melhor realizar conversões explícitas:
+
+*   **Para Número:**
+    *   `parseInt(string, base)`: Converte uma string para um inteiro. O `base` (geralmente 10) é recomendado. Para na primeira letra não numérica.
+    *   `parseFloat(string)`: Converte uma string para um número de ponto flutuante.
+    *   `Number(valor)`: Tenta converter o `valor` para número. Retorna `NaN` se não for possível. Mais rigoroso que `parseInt`/`parseFloat`.
+    *   Operador unário `+`: `+string` tenta converter a string para número.
+
+*   **Para String:**
+    *   `valor.toString()`: Converte o `valor` para string (não funciona em `null` ou `undefined`).
+    *   `String(valor)`: Converte qualquer `valor` para string (forma mais segura).
+    *   Concatenação com string vazia: `"" + valor`.
+
+*   **Para Boolean:**
+    *   `Boolean(valor)`: Converte o `valor` para `true` ou `false`.
+    *   Valores "falsy": `false`, `0`, `-0`, `0n` (BigInt zero), `""` (string vazia), `null`, `undefined`, `NaN`. Todos os outros valores são "truthy".
+    *   Negação dupla `!!`: `!!valor` é uma forma curta de converter para booleano.
+
+[CODE_BLOCK lang="javascript" title="type_conversion.js"]
+// Para Número
+let strNumero = "42";
+let strDecimal = "3.1415";
+let strComTexto = "100 Reais";
+let strVazia = "";
+let valorNulo = null;
+
+console.log(parseInt(strNumero)); // 42
+console.log(parseInt(strDecimal)); // 3 (para no '.')
+console.log(parseInt(strComTexto)); // 100 (para no ' ')
+console.log(parseInt("1011", 2)); // 11 (interpreta como binário base 2)
+
+console.log(parseFloat(strDecimal)); // 3.1415
+console.log(parseFloat(strComTexto)); // 100
+
+console.log(Number(strNumero)); // 42
+console.log(Number(strDecimal)); // 3.1415
+console.log(Number(strComTexto)); // NaN
+console.log(Number(strVazia)); // 0
+console.log(Number(valorNulo)); // 0
+console.log(Number(true)); // 1
+console.log(Number(false)); // 0
+
+console.log(+strNumero); // 42
+console.log(+strDecimal); // 3.1415
+console.log(+strComTexto); // NaN
+
+// Para String
+let num = 123;
+let bool = true;
+let obj = { a: 1 };
+
+console.log(num.toString()); // "123"
+console.log(bool.toString()); // "true"
+// console.log(valorNulo.toString()); // Erro!
+console.log(String(num)); // "123"
+console.log(String(valorNulo)); // "null"
+console.log(String(undefined)); // "undefined"
+console.log(String(obj)); // "[object Object]"
+
+// Para Boolean
+console.log(Boolean(1)); // true
+console.log(Boolean(0)); // false
+console.log(Boolean("texto")); // true
+console.log(Boolean("")); // false
+console.log(Boolean(null)); // false
+console.log(Boolean(undefined)); // false
+console.log(Boolean(NaN)); // false
+console.log(Boolean({})); // true (objeto vazio é truthy)
+console.log(Boolean([])); // true (array vazio é truthy)
+
+console.log(!!num); // true
+console.log(!!0); // false
+[/CODE_BLOCK]
+
+# 4. Operadores
+
+Operadores são símbolos especiais usados para realizar operações em valores (operandos).
+
+## Operadores matemáticos (`+`, `-`, `*`, `/`, `%`, `**`)
+
+Realizam operações aritméticas básicas:
+
+*   `+`: Adição (também usado para concatenação de strings)
+*   `-`: Subtração
+*   `*`: Multiplicação
+*   `/`: Divisão
+*   `%`: Módulo (resto da divisão)
+*   `**`: Exponenciação (ES7)
+*   `++`: Incremento (adiciona 1) - Pode ser pré-fixado (`++x`) ou pós-fixado (`x++`)
+*   `--`: Decremento (subtrai 1) - Pode ser pré-fixado (`--x`) ou pós-fixado (`x--`)
+
+**Ordem de Precedência:** Multiplicação, divisão e módulo são executados antes de adição e subtração. Parênteses `()` podem ser usados para alterar a ordem.
+
+[CODE_BLOCK lang="javascript" title="math_operators.js"]
+let x = 10;
+let y = 4;
+let z = 2;
+
+console.log("Adição:", x + y); // 14
+console.log("Subtração:", x - y); // 6
+console.log("Multiplicação:", y * z); // 8
+console.log("Divisão:", x / z); // 5
+console.log("Módulo (Resto):", x % y); // 2 (10 dividido por 4 dá 2, resto 2)
+console.log("Exponenciação:", y ** z); // 16 (4 elevado a 2)
+
+// Concatenação de String vs Adição
+console.log("5" + 5); // "55" (String) - Cuidado com a coerção!
+console.log(5 + 5); // 10 (Number)
+console.log(Number("5") + 5); // 10 (Conversão explícita)
+
+// Incremento e Decremento
+let contador = 5;
+console.log("Contador inicial:", contador); // 5
+console.log("Pós-incremento:", contador++); // 5 (exibe 5, depois incrementa para 6)
+console.log("Contador após pós-incremento:", contador); // 6
+console.log("Pré-incremento:", ++contador); // 7 (incrementa para 7, depois exibe 7)
+console.log("Contador após pré-incremento:", contador); // 7
+
+let outroContador = 10;
+console.log("Outro contador:", outroContador); // 10
+console.log("Pós-decremento:", outroContador--); // 10 (exibe 10, depois decrementa para 9)
+console.log("Após pós-decremento:", outroContador); // 9
+console.log("Pré-decremento:", --outroContador); // 8 (decrementa para 8, depois exibe 8)
+console.log("Após pré-decremento:", outroContador); // 8
+
+// Precedência
+console.log("Precedência:", 10 + 5 * 2); // 20 (5 * 2 primeiro)
+console.log("Com Parênteses:", (10 + 5) * 2); // 30 (10 + 5 primeiro)
+[/CODE_BLOCK]
+
+## Operadores de atribuição (`=`, `+=`, `-=`, `*=`, `/=`, `%=`, `**=`)
+
+Atribuem valores a variáveis.
+
+*   `=`: Atribuição simples.
+*   `+=`, `-=`, `*=`, `/=`, `%=`, `**=`: Operadores compostos que realizam a operação matemática e depois atribuem o resultado à variável da esquerda. Ex: `a += 5` é o mesmo que `a = a + 5`.
+
+[CODE_BLOCK lang="javascript" title="assignment_operators.js"]
+let a = 10;
+let b = 5;
+let c = 3;
+let d = 2;
+let e = 100;
+let f = 7;
+let g = 4;
+
+a += b; // a = a + b => a = 10 + 5 => a = 15
+console.log("a += b:", a); // 15
+
+a -= c; // a = a - c => a = 15 - 3 => a = 12
+console.log("a -= c:", a); // 12
+
+a *= d; // a = a * d => a = 12 * 2 => a = 24
+console.log("a *= d:", a); // 24
+
+e /= b; // e = e / b => e = 100 / 5 => e = 20
+console.log("e /= b:", e); // 20
+
+f %= d; // f = f % d => f = 7 % 2 => f = 1
+console.log("f %= d:", f); // 1
+
+g **= c; // g = g ** c => g = 4 ** 3 => g = 64
+console.log("g **= c:", g); // 64
+[/CODE_BLOCK]
+
+## Operadores de comparação (`==`, `===`, `!=`, `!==`, `>`, `<`, `>=`, `<=`)
+
+Comparam dois valores e retornam um resultado booleano (`true` ou `false`).
+
+*   `==`: Igualdade (com coerção de tipo). **Evitar** na maioria dos casos.
+*   `===`: Igualdade estrita (sem coerção de tipo - compara valor E tipo). **Preferível**.
+*   `!=`: Diferença (com coerção de tipo). **Evitar**.
+*   `!==`: Diferença estrita (sem coerção de tipo). **Preferível**.
+*   `>`: Maior que.
+*   `<`: Menor que.
+*   `>=`: Maior ou igual a.
+*   `<=`: Menor ou igual a.
+
+[CODE_BLOCK lang="javascript" title="comparison_operators.js"]
+let val1 = 5;
+let val2 = 10;
+let val3 = "5";
+let val4 = 5;
+
+console.log("val1 == val3 :", val1 == val3);   // true (5 == "5" -> coerção) - PERIGOSO!
+console.log("val1 === val3:", val1 === val3); // false (number === string) - MAIS SEGURO!
+console.log("val1 === val4:", val1 === val4); // true (number === number, mesmo valor)
+
+console.log("val1 != val3 :", val1 != val3);   // false (5 != "5" -> coerção diz que são iguais) - PERIGOSO!
+console.log("val1 !== val3:", val1 !== val3); // true (number !== string) - MAIS SEGURO!
+console.log("val1 !== val4:", val1 !== val4); // false (number !== number, são iguais)
+
+console.log("val1 > val2  :", val1 > val2);   // false (5 > 10)
+console.log("val2 >= val1 :", val2 >= val1); // true (10 >= 5)
+console.log("val1 < val2  :", val1 < val2);   // true (5 < 10)
+console.log("val1 <= val4 :", val1 <= val4); // true (5 <= 5)
+[/CODE_BLOCK]
+
+**Regra geral:** Use sempre `===` e `!==` para comparações de igualdade/diferença para evitar surpresas causadas pela coerção automática de tipos.
+
+## Operadores lógicos (`&&`, `||`, `!`)
+
+Combinam expressões booleanas.
+
+*   `&&` (E lógico): Retorna `true` somente se **ambos** os operandos forem `true`.
+    *   Possui "curto-circuito": se o primeiro operando for `false`, o segundo nem é avaliado.
+*   `||` (OU lógico): Retorna `true` se **pelo menos um** dos operandos for `true`.
+    *   Possui "curto-circuito": se o primeiro operando for `true`, o segundo nem é avaliado.
+*   `!` (NÃO lógico): Inverte o valor booleano do operando (`true` vira `false`, `false` vira `true`).
+
+[CODE_BLOCK lang="javascript" title="logical_operators.js"]
+let usuarioLogado = true;
+let temPermissao = false;
+let idade = 20;
+let produtoDisponivel = true;
+
+console.log("Logado E tem permissão?", usuarioLogado && temPermissao); // false (true && false)
+console.log("Logado OU tem permissão?", usuarioLogado || temPermissao); // true (true || false)
+console.log("É maior de idade E produto disponível?", (idade >= 18) && produtoDisponivel); // true (true && true)
+console.log("Não está logado?", !usuarioLogado); // false (!true)
+console.log("Não tem permissão?", !temPermissao); // true (!false)
+
+// Curto-circuito com &&
+let resultadoE = temPermissao && (idade > 30); // temPermissao é false, (idade > 30) nem é verificado
+console.log("Resultado E (curto-circuito):", resultadoE); // false
+
+// Curto-circuito com ||
+let resultadoOU = usuarioLogado || (idade < 10); // usuarioLogado é true, (idade < 10) nem é verificado
+console.log("Resultado OU (curto-circuito):", resultadoOU); // true
+
+// Usando operadores lógicos para valores padrão (cuidado com valores "falsy" como 0 ou "")
+let nomeUsuario = null;
+let nomeExibicao = nomeUsuario || "Visitante"; // Se nomeUsuario for null (falsy), usa "Visitante"
+console.log("Nome exibição:", nomeExibicao); // "Visitante"
+
+// Operador de coalescência nula (??) - ES2020 - Melhor para valores padrão
+// Retorna o operando direito APENAS se o esquerdo for null ou undefined
+let contador = 0;
+let valorContador = contador ?? 10; // contador é 0 (não é null/undefined), usa 0
+console.log("Valor contador (??):", valorContador); // 0
+
+let configNula = null;
+let configPadrao = configNula ?? { tema: 'light' }; // configNula é null, usa o padrão
+console.log("Config padrão (??):", configPadrao); // { tema: 'light' }
+[/CODE_BLOCK]
+
+## Operador ternário (`condition ? value_if_true : value_if_false`)
+
+Um atalho para uma estrutura `if...else` simples, útil para atribuições condicionais.
+
+*   Avalia a `condition`.
+*   Se `condition` for `true`, a expressão retorna `value_if_true`.
+*   Se `condition` for `false`, a expressão retorna `value_if_false`.
+
+[CODE_BLOCK lang="javascript" title="ternary_operator.js"]
+let idadeCliente = 22;
+let tipoCliente = (idadeCliente >= 18) ? "Adulto" : "Menor";
+console.log("Tipo do Cliente:", tipoCliente); // "Adulto"
+
+let pontuacao = 75;
+let statusAprovacao = (pontuacao >= 60) ? "Aprovado" : "Reprovado";
+console.log("Status Aprovação:", statusAprovacao); // "Aprovado"
+
+let autenticado = false;
+let mensagemLogin = autenticado ? "Bem-vindo!" : "Por favor, faça o login.";
+console.log("Mensagem Login:", mensagemLogin); // "Por favor, faça o login."
+
+// Pode ser aninhado, mas CUIDADO com a legibilidade
+let nota = 8;
+let conceito = (nota >= 9) ? 'A' : (nota >= 7) ? 'B' : (nota >= 5) ? 'C' : 'D';
+console.log("Conceito:", conceito); // 'B'
+[/CODE_BLOCK]
+
+Embora útil, evite usar operadores ternários para lógicas muito complexas, pois podem dificultar a leitura do código. Nesses casos, um `if...else` tradicional é preferível.
+
+# 5. Estruturas de Controle
+
+Estruturas de controle permitem direcionar o fluxo de execução do seu código, tomando decisões (condicionais) ou repetindo blocos de código (laços).
+
+## Condicionais: `if`, `else if`, `else`, `switch`
+
+Permitem executar blocos de código diferentes com base em condições booleanas.
+
+*   **`if (condição)`**: Executa o bloco de código seguinte `{ ... }` somente se a `condição` for `true`.
+*   **`else if (outraCondição)`**: (Opcional) Executada se a condição do `if` anterior for `false`, mas `outraCondição` for `true`. Pode haver vários `else if`.
+*   **`else`**: (Opcional) Executada se todas as condições anteriores (`if` e `else if`) forem `false`.
+*   **`switch (expressão)`**: Avalia uma `expressão` e executa o bloco de código associado ao `case` que corresponde ao valor da expressão.
+    *   `case valor:`: Define um bloco a ser executado se `expressão === valor`.
+    *   `break;`: **Essencial** após cada `case` para sair do `switch`. Sem `break`, a execução "cai" para o próximo `case` (fall-through).
+    *   `default:`: (Opcional) Executado se nenhum `case` corresponder.
+
+[CODE_BLOCK lang="javascript" title="conditionals.js"]
+// Exemplo if/else if/else
+let hora = 14;
+
+if (hora < 12) {
+  console.log("Bom dia!");
+} else if (hora < 18) {
+  console.log("Boa tarde!"); // Esta condição é verdadeira
+} else {
+  console.log("Boa noite!");
+}
+
+let temperatura = 25;
+let clima = "ensolarado";
+
+if (temperatura > 30 && clima === "ensolarado") {
+  console.log("Vá para a praia!");
+} else if (temperatura < 10) {
+  console.log("Agasalhe-se bem!");
+} else {
+  console.log("Clima agradável."); // Esta condição é verdadeira
+}
+
+// Exemplo switch
+let diaSemana = 3; // 1=Domingo, 2=Segunda, ... 7=Sábado
+let nomeDia;
+
+switch (diaSemana) {
+  case 1:
+    nomeDia = "Domingo";
+    break; // Sai do switch
+  case 2:
+    nomeDia = "Segunda-feira";
+    break;
+  case 3:
+    nomeDia = "Terça-feira"; // Corresponde!
+    break;
+  case 4:
+    nomeDia = "Quarta-feira";
+    break;
+  case 5:
+    nomeDia = "Quinta-feira";
+    break;
+  case 6:
+    nomeDia = "Sexta-feira";
+    console.log("Sextou!"); // Pode ter mais código no case
+    break;
+  case 7:
+    nomeDia = "Sábado";
+    break;
+  default: // Se diaSemana não for 1-7
+    nomeDia = "Dia inválido";
+    break;
+}
+console.log("Hoje é:", nomeDia); // "Terça-feira"
+
+// Switch com fall-through (sem break) - Use com cautela!
+let nivelAcesso = "admin";
+let podeEditar = false;
+let podeVisualizar = false;
+
+switch (nivelAcesso) {
+  case "admin":
+    podeEditar = true;
+    // Sem break aqui! Cai para o próximo case.
+  case "editor":
+    podeVisualizar = true; // Admins e Editores podem visualizar
+    break;
+  case "leitor":
+    podeVisualizar = true; // Leitores só podem visualizar
+    break;
+  default:
+    console.log("Nível de acesso desconhecido.");
+}
+
+console.log(`Pode Editar: ${podeEditar}, Pode Visualizar: ${podeVisualizar}`); // true, true
+[/CODE_BLOCK]
+
+## Laços de repetição: `for`, `while`, `do while`
+
+Permitem executar um bloco de código múltiplas vezes.
+
+*   **`for (inicialização; condição; incremento)`**: O laço mais comum.
+    1.  `inicialização`: Executada uma vez antes do laço começar (ex: `let i = 0`).
+    2.  `condição`: Verificada antes de cada iteração. Se `true`, o bloco executa; se `false`, o laço termina (ex: `i < 5`).
+    3.  `bloco de código`: Executado se a condição for `true`.
+    4.  `incremento`: Executado após cada iteração (ex: `i++`).
+
+*   **`while (condição)`**: Executa o bloco de código `{ ... }` **enquanto** a `condição` for `true`. A condição é verificada *antes* de cada iteração. Se a condição for falsa inicialmente, o bloco nunca executa.
+
+*   **`do { ... } while (condição)`**: Similar ao `while`, mas executa o bloco de código `{ ... }` **pelo menos uma vez** e *depois* verifica a `condição`. Se `true`, repete; se `false`, para.
+
+[CODE_BLOCK lang="javascript" title="loops.js"]
+// Exemplo for
+console.log("Contagem com FOR:");
+for (let i = 0; i < 5; i++) {
+  console.log(`Iteração número ${i}`);
+}
+// Saída: 0, 1, 2, 3, 4
+
+// Exemplo while
+console.log("\nContagem com WHILE:");
+let contadorWhile = 0;
+while (contadorWhile < 3) {
+  console.log(`While - contador: ${contadorWhile}`);
+  contadorWhile++; // IMPORTANTE: atualizar a variável de controle!
+}
+// Saída: 0, 1, 2
+
+// Exemplo do...while
+console.log("\nContagem com DO...WHILE:");
+let contadorDo = 5;
+do {
+  console.log(`Do...While - contador: ${contadorDo}`); // Executa pelo menos uma vez
+  contadorDo++;
+} while (contadorDo < 5); // Condição é falsa, para após a primeira execução
+// Saída: 5
+
+// Loop infinito (CUIDADO!) - Exemplo de como parar com 'break'
+let contadorInfinito = 0;
+while(true) { // Condição sempre verdadeira
+    console.log("Loop infinito? " + contadorInfinito);
+    contadorInfinito++;
+    if (contadorInfinito > 5) {
+        console.log("Parando o loop com break!");
+        break; // Sai imediatamente do loop (while, for, do...while, switch)
+    }
+    if (contadorInfinito === 3) {
+        console.log("Pulando a iteração 3 com continue!");
+        continue; // Pula o resto do código desta iteração e vai para a próxima
+    }
+    console.log("Fim da iteração " + (contadorInfinito -1)); // Não executa quando contadorInfinito é 3
+}
+[/CODE_BLOCK]
+
+## Manipulação de arrays com `forEach`, `map`, `filter`, `reduce`
+
+Estes são métodos de array muito poderosos e expressivos para iterar e transformar dados, frequentemente preferíveis aos laços `for` tradicionais para manipulação de arrays. Eles geralmente recebem uma *função de callback* como argumento.
+
+*   **`forEach(callback(elemento, indice, array))`**: Executa a função `callback` uma vez para cada elemento do array. Não retorna um novo array (retorna `undefined`). Usado para realizar uma ação em cada elemento (ex: exibir no console, atualizar o DOM).
+
+*   **`map(callback(elemento, indice, array))`**: Cria um **novo array** com os resultados da chamada da função `callback` para cada elemento do array original. Útil para transformar dados (ex: dobrar números, extrair uma propriedade de objetos).
+
+*   **`filter(callback(elemento, indice, array))`**: Cria um **novo array** contendo apenas os elementos do array original para os quais a função `callback` retorna `true`. Útil para selecionar elementos que atendem a um critério.
+
+*   **`reduce(callback(acumulador, elementoAtual, indice, array), valorInicial)`**: Executa a função `callback` (redutor) para cada elemento, resultando em um **único valor de retorno**.
+    *   `acumulador`: O valor retornado pela última chamada do callback (ou `valorInicial` na primeira chamada).
+    *   `elementoAtual`: O elemento sendo processado.
+    *   `valorInicial` (opcional): Valor inicial para o `acumulador`. Se omitido, o primeiro elemento do array é usado como valor inicial e a iteração começa do segundo.
+    *   Útil para somar valores, encontrar o maior/menor, agrupar dados, etc.
+
+[CODE_BLOCK lang="javascript" title="array_methods.js"]
+const numeros = [1, 2, 3, 4, 5];
+const nomes = ["Ana", "Bruno", "Carla", "Daniel"];
+const produtos = [
+  { id: 1, nome: "Laptop", preco: 3500 },
+  { id: 2, nome: "Mouse", preco: 80 },
+  { id: 3, nome: "Teclado", preco: 150 },
+  { id: 4, nome: "Monitor", preco: 1200 },
+];
+
+// forEach: Exibir cada número
+console.log("--- forEach ---");
+numeros.forEach(function(numero, index) {
+  console.log(`Índice ${index}: ${numero}`);
+});
+// Alternativa com Arrow Function:
+// numeros.forEach(numero => console.log(numero));
+
+// map: Criar um array com o dobro de cada número
+console.log("\n--- map ---");
+const numerosDobrados = numeros.map(function(numero) {
+  return numero * 2;
+});
+console.log("Números dobrados:", numerosDobrados); // [2, 4, 6, 8, 10]
+// Alternativa com Arrow Function:
+// const numerosDobrados = numeros.map(numero => numero * 2);
+
+// map: Criar um array apenas com os nomes dos produtos
+const nomesProdutos = produtos.map(produto => produto.nome);
+console.log("Nomes dos produtos:", nomesProdutos); // ["Laptop", "Mouse", "Teclado", "Monitor"]
+
+// filter: Criar um array apenas com números pares
+console.log("\n--- filter ---");
+const numerosPares = numeros.filter(function(numero) {
+  return numero % 2 === 0; // Retorna true se for par
+});
+console.log("Números pares:", numerosPares); // [2, 4]
+// Alternativa com Arrow Function:
+// const numerosPares = numeros.filter(numero => numero % 2 === 0);
+
+// filter: Criar um array com produtos caros (preço > 1000)
+const produtosCaros = produtos.filter(produto => produto.preco > 1000);
+console.log("Produtos caros:", produtosCaros); // [{ id: 1, ... }, { id: 4, ... }]
+
+// reduce: Calcular a soma de todos os números
+console.log("\n--- reduce ---");
+const somaTotal = numeros.reduce(function(acumulador, numeroAtual) {
+  console.log(`Acumulador: ${acumulador}, Atual: ${numeroAtual}`);
+  return acumulador + numeroAtual;
+}, 0); // 0 é o valorInicial do acumulador
+console.log("Soma total:", somaTotal); // 15
+// Alternativa com Arrow Function:
+// const somaTotal = numeros.reduce((acc, num) => acc + num, 0);
+
+// reduce: Calcular o preço total dos produtos
+const precoTotalProdutos = produtos.reduce((soma, produto) => soma + produto.preco, 0);
+console.log("Preço total dos produtos:", precoTotalProdutos); // 4930
+[/CODE_BLOCK]
+
+Estes métodos tornam o código mais conciso e legível quando se trabalha com arrays.
+
+# 6. Funções
+
+Funções são blocos de código reutilizáveis que realizam uma tarefa específica. Elas são fundamentais para organizar o código, evitar repetição e torná-lo mais modular. Em JavaScript, funções são cidadãs de primeira classe, o que lhes confere grande flexibilidade.
+
+## Declaração de funções (`function nome() {}`)
+
+A forma mais tradicional de criar uma função.
+
+*   Usa a palavra-chave `function`, seguida pelo nome da função, parênteses `()` (que podem conter parâmetros) e chaves `{}` envolvendo o corpo da função.
+*   Funções declaradas dessa forma sofrem *hoisting*, o que significa que podem ser chamadas *antes* de sua declaração no código.
+
+[CODE_BLOCK lang="javascript" title="function_declaration.js"]
+// Declaração da função
+function cumprimentar(nome) {
+  console.log(`Olá, ${nome}!`);
+}
+
+// Chamando a função
+cumprimentar("Maria"); // Saída: Olá, Maria!
+cumprimentar("João");  // Saída: Olá, João!
+
+// Função com retorno
+function somarDeclarada(a, b) {
+  let resultado = a + b;
+  return resultado; // Retorna o valor calculado
+  // Qualquer código após o return não é executado
+}
+
+let resultadoSoma = somarDeclarada(5, 3);
+console.log("Resultado da soma (declarada):", resultadoSoma); // Saída: 8
+
+// Hoisting: A função pode ser chamada antes da declaração
+let area = calcularAreaRetangulo(10, 5);
+console.log("Área (hoisting):", area); // Saída: 50
+
+function calcularAreaRetangulo(largura, altura) {
+  return largura * altura;
+}
+[/CODE_BLOCK]
+
+## Funções anônimas e arrow functions
+
+JavaScript permite criar funções sem um nome específico (anônimas) e também uma sintaxe mais concisa chamada Arrow Functions (introduzida no ES6).
+
+*   **Função Anônima (Function Expression):** Uma função sem nome atribuída a uma variável.
+    *   **Não** sofre hoisting da mesma forma que a declaração de função. Você só pode chamá-la *após* a linha onde foi atribuída à variável.
+    *   Frequentemente usada como argumento para outras funções (callbacks).
+
+*   **Arrow Function (`=>`)**: Uma sintaxe mais curta para criar funções.
+    *   Se a função tiver apenas **uma expressão** como corpo, as chaves `{}` e a palavra `return` podem ser omitidas (retorno implícito).
+    *   Se tiver **apenas um parâmetro**, os parênteses `()` ao redor do parâmetro podem ser omitidos.
+    *   Se **não tiver parâmetros**, use parênteses vazios `()`.
+    *   Possui um comportamento diferente com a palavra-chave `this` em comparação com funções tradicionais (ela não tem seu próprio `this`, herda do contexto léxico). Isso é importante em programação orientada a objetos e manipulação de eventos, mas não abordaremos em profundidade aqui.
+
+[CODE_BLOCK lang="javascript" title="anonymous_arrow.js"]
+// Função Anônima (Function Expression)
+const multiplicar = function(a, b) {
+  return a * b;
+}; // Note o ponto e vírgula aqui, pois é uma atribuição
+
+let resultadoMult = multiplicar(4, 6);
+console.log("Resultado multiplicação (anônima):", resultadoMult); // 24
+
+// Tentativa de chamar antes da atribuição (erro!)
+// let resSub = subtrairAnonimo(10, 2); // Erro: Cannot access 'subtrairAnonimo' before initialization
+// const subtrairAnonimo = function(a, b) { return a - b; };
+
+// Arrow Functions
+const dividir = (a, b) => {
+  if (b === 0) {
+    console.error("Divisão por zero!");
+    return undefined;
+  }
+  return a / b;
+};
+console.log("Resultado divisão (arrow):", dividir(20, 4)); // 5
+console.log("Divisão por zero (arrow):", dividir(10, 0)); // undefined (e mensagem de erro)
+
+// Arrow Function com retorno implícito (uma única expressão)
+const quadrado = numero => numero * numero; // Parênteses do parâmetro omitidos, {} e return omitidos
+console.log("Quadrado de 9 (arrow curta):", quadrado(9)); // 81
+
+// Arrow Function sem parâmetros
+const getMensagem = () => "Olá, mundo das Arrow Functions!";
+console.log(getMensagem()); // "Olá, mundo das Arrow Functions!"
+
+// Usando Arrow Function com métodos de array
+const numeros = [1, 2, 3, 4];
+const numerosTriplicados = numeros.map(n => n * 3); // Conciso!
+console.log("Números triplicados (map com arrow):", numerosTriplicados); // [3, 6, 9, 12]
+[/CODE_BLOCK]
+
+## Parâmetros e valores de retorno
+
+*   **Parâmetros:** São as variáveis listadas dentro dos parênteses `()` na definição da função. Elas recebem os valores passados quando a função é chamada (argumentos).
+*   **Argumentos:** São os valores reais passados para a função quando ela é invocada.
+*   **Parâmetros Padrão (ES6):** Você pode definir um valor padrão para um parâmetro caso nenhum argumento seja passado para ele.
+*   **Retorno (`return`):** A palavra-chave `return` especifica o valor que a função deve "enviar de volta" para o local onde foi chamada. Se `return` for omitido ou usado sem um valor, a função retorna `undefined`.
+
+[CODE_BLOCK lang="javascript" title="parameters_return.js"]
+function dadosPessoa(nome, idade = 18, cidade = "Não informada") { // idade e cidade têm valores padrão
+  console.log(`Nome: ${nome}`);
+  console.log(`Idade: ${idade}`);
+  console.log(`Cidade: ${cidade}`);
+  return `Nome: ${nome}, Idade: ${idade}, Cidade: ${cidade}`; // Retorna uma string formatada
+}
+
+console.log("--- Chamada 1 ---");
+dadosPessoa("Carlos", 30, "São Paulo"); // Todos os argumentos passados
+
+console.log("\n--- Chamada 2 ---");
+dadosPessoa("Fernanda", 25); // Usa cidade padrão
+
+console.log("\n--- Chamada 3 ---");
+dadosPessoa("Gabriel"); // Usa idade e cidade padrão
+
+console.log("\n--- Capturando o retorno ---");
+let infoCarlos = dadosPessoa("Carlos", 30, "São Paulo");
+console.log("Retorno capturado:", infoCarlos);
+
+// Função sem return explícito
+function semRetorno() {
+  console.log("Esta função não retorna nada explicitamente.");
+}
+let valorRetornado = semRetorno();
+console.log("Valor retornado pela função sem return:", valorRetornado); // undefined
+[/CODE_BLOCK]
+
+## Funções de callback
+
+Uma função de callback é uma função que é passada como **argumento** para outra função, com a intenção de ser executada (*called back*) posteriormente, geralmente após a conclusão de uma operação assíncrona ou como parte de um processo.
+
+Já vimos callbacks em ação com os métodos de array (`forEach`, `map`, `filter`, `reduce`) e com `addEventListener` (que veremos mais adiante).
+
+[CODE_BLOCK lang="javascript" title="callbacks.js"]
+// Função principal que ACEITA um callback
+function processarDados(dados, callbackSucesso, callbackErro) {
+  console.log("Processando dados:", dados);
+  // Simula uma operação (ex: validação, cálculo)
+  let sucesso = Math.random() > 0.3; // Simula sucesso ~70% das vezes
+
+  if (sucesso) {
+    console.log("Processamento concluído com sucesso.");
+    let resultado = `Dados processados: ${dados.toUpperCase()}`;
+    callbackSucesso(resultado); // Chama o callback de sucesso
+  } else {
+    console.log("Erro no processamento.");
+    callbackErro("Falha ao processar os dados"); // Chama o callback de erro
+  }
+}
+
+// Definindo as funções de callback
+function lidarComSucesso(resultadoFinal) {
+  console.log("CALLBACK SUCESSO:", resultadoFinal);
+}
+
+function lidarComErro(mensagemErro) {
+  console.error("CALLBACK ERRO:", mensagemErro);
+}
+
+// Chamando a função principal e passando os callbacks
+console.log("--- Tentativa 1 ---");
+processarDados("informação importante", lidarComSucesso, lidarComErro);
+
+console.log("\n--- Tentativa 2 ---");
+processarDados("outra tentativa", lidarComSucesso, lidarComErro);
+
+// Passando funções anônimas ou arrow functions como callbacks (muito comum)
+console.log("\n--- Tentativa 3 (com arrow functions) ---");
+processarDados("dados com arrow",
+  (resultado) => {
+    console.log("ARROW SUCESSO =>", resultado);
+    // Fazer algo mais aqui se necessário
+  },
+  (erro) => {
+    console.error("ARROW ERRO =>", erro);
+    // Mostrar mensagem de erro para o usuário, etc.
+  }
+);
+
+// Exemplo com setTimeout (operação assíncrona)
+console.log("\n--- Exemplo com setTimeout ---");
+console.log("Iniciando timer...");
+setTimeout(function() { // Função anônima como callback
+  console.log("TIMER: Callback executado após 2 segundos!");
+}, 2000); // 2000 milissegundos = 2 segundos
+console.log("Timer iniciado, código continua...");
+[/CODE_BLOCK]
+
+Callbacks são um padrão fundamental em JavaScript, especialmente para lidar com operações que não terminam imediatamente (assíncronas).
+
+# 7. Manipulação do DOM
+
+O **DOM (Document Object Model)** é uma representação estruturada (em forma de árvore) do documento HTML. O JavaScript pode usar o DOM para acessar, modificar, adicionar ou remover elementos e conteúdo da página HTML dinamicamente.
+
+## Selecionando elementos (`document.querySelector`, `document.getElementById`, etc.)
+
+Para manipular um elemento, você primeiro precisa selecioná-lo. Existem vários métodos para isso, disponíveis no objeto global `document`:
+
+*   **`document.getElementById('idDoElemento')`**: Seleciona o **único** elemento que possui o `id` especificado. Retorna o elemento ou `null` se não encontrado. É muito rápido.
+
+*   **`document.querySelector('seletorCSS')`**: Seleciona o **primeiro** elemento no documento que corresponde ao `seletorCSS` fornecido (igual aos seletores que você usa no CSS: `#id`, `.classe`, `tag`, `[atributo]`, `tag.classe`, etc.). Retorna o elemento ou `null`. Muito versátil.
+
+*   **`document.querySelectorAll('seletorCSS')`**: Seleciona **todos** os elementos no documento que correspondem ao `seletorCSS`. Retorna uma `NodeList` (parecida com um array, mas não exatamente igual) contendo os elementos encontrados. Se nenhum for encontrado, retorna uma `NodeList` vazia.
+
+*   **`document.getElementsByClassName('nomeDaClasse')`**: Seleciona **todos** os elementos que possuem a classe especificada. Retorna uma `HTMLCollection` (também parecida com array, "ao vivo").
+
+*   **`document.getElementsByTagName('nomeDaTag')`**: Seleciona **todos** os elementos com a tag HTML especificada (ex: 'p', 'div', 'li'). Retorna uma `HTMLCollection`.
+
+**Recomendação moderna:** `querySelector` e `querySelectorAll` são geralmente preferidos por sua flexibilidade em usar qualquer seletor CSS. `getElementById` ainda é ótimo para buscar por IDs únicos. `getElementsByClassName` e `getElementsByTagName` são menos usados hoje em dia.
+
+[CODE_BLOCK lang="html" title="dom_selection.html"]
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seleção DOM</title>
+    <style> .destaque { background-color: yellow; } </style>
+</head>
+<body>
+    <h1 id="titulo-principal">Título da Página</h1>
+    <p class="paragrafo info">Este é o primeiro parágrafo.</p>
+    <p class="paragrafo importante">Este é o segundo parágrafo.</p>
+    <div>
+        <p>Parágrafo dentro de uma div.</p>
+    </div>
+    <ul>
+        <li class="item">Item 1</li>
+        <li class="item">Item 2</li>
+        <li class="item">Item 3</li>
+    </ul>
+    <input type="text" id="campoNome" value="Valor inicial">
+
+    <script src="dom_selection.js"></script>
+</body>
+</html>
+[/CODE_BLOCK]
+
+[CODE_BLOCK lang="javascript" title="dom_selection.js"]
+console.log("--- Selecionando Elementos ---");
+
+// Por ID
+const titulo = document.getElementById('titulo-principal');
+console.log("Elemento por ID:", titulo);
+
+// Por Seletor CSS (primeiro encontrado)
+const primeiroParagrafo = document.querySelector('.paragrafo'); // Pega o primeiro com a classe 'paragrafo'
+console.log("Primeiro Parágrafo (querySelector):", primeiroParagrafo);
+
+const paragrafoImportante = document.querySelector('.paragrafo.importante');
+console.log("Parágrafo Importante (querySelector):", paragrafoImportante);
+
+const paragrafoNaDiv = document.querySelector('div p'); // Pega o primeiro 'p' dentro de 'div'
+console.log("Parágrafo na Div (querySelector):", paragrafoNaDiv);
+
+const itemLiEspecifico = document.querySelector('ul li.item:nth-child(2)'); // Segundo item da lista
+console.log("Segundo Item Li (querySelector):", itemLiEspecifico);
+
+// Por Seletor CSS (todos encontrados)
+const todosParagrafos = document.querySelectorAll('.paragrafo');
+console.log("Todos Parágrafos (querySelectorAll):", todosParagrafos); // NodeList [p.paragrafo.info, p.paragrafo.importante]
+// Podemos iterar sobre NodeList com forEach
+todosParagrafos.forEach((paragrafo, index) => {
+    console.log(`Parágrafo ${index + 1}:`, paragrafo.innerText);
+});
+
+const todosItensLi = document.querySelectorAll('li.item');
+console.log("Todos Itens Li (querySelectorAll):", todosItensLi);
+
+// Por Classe (HTMLCollection - menos usado hoje)
+const paragrafosPorClasse = document.getElementsByClassName('paragrafo');
+console.log("Parágrafos por Classe:", paragrafosPorClasse); // HTMLCollection
+
+// Por Tag (HTMLCollection - menos usado hoje)
+const todosOsPs = document.getElementsByTagName('p');
+console.log("Todos Elementos <p>:", todosOsPs);
+
+// Exemplo de elemento não encontrado
+const elementoInexistente = document.getElementById('id-nao-existe');
+console.log("Elemento Inexistente por ID:", elementoInexistente); // null
+
+const seletorInexistente = document.querySelector('.classe-nao-existe');
+console.log("Seletor Inexistente:", seletorInexistente); // null
+[/CODE_BLOCK]
+
+## Alterando conteúdo (`.innerText`, `.innerHTML`, `.value`)
+
+Uma vez que um elemento é selecionado, você pode alterar seu conteúdo:
+
+*   **`elemento.innerText`**: Define ou obtém o conteúdo de texto **visível** do elemento e seus descendentes. Ignora tags HTML e scripts. É geralmente mais seguro e performático para alterar apenas texto.
+*   **`elemento.innerHTML`**: Define ou obtém o conteúdo HTML completo dentro do elemento, incluindo tags. **Cuidado:** Usar `innerHTML` com dados vindos de fontes não confiáveis (como input de usuário) pode levar a vulnerabilidades de segurança (XSS - Cross-Site Scripting), pois permite a injeção de HTML e scripts maliciosos. Use com cautela.
+*   **`elemento.textContent`**: Similar ao `innerText`, mas obtém todo o conteúdo de texto, incluindo o de elementos escondidos por CSS e preservando melhor a formatação (espaços). É frequentemente preferível ao `innerText` para obter texto. Para definir texto, `innerText` ou `textContent` são geralmente seguros.
+*   **`inputElement.value`**: Para elementos de formulário como `<input>`, `<textarea>`, `<select>`, a propriedade `value` é usada para obter ou definir o valor atual do campo.
+
+[CODE_BLOCK lang="javascript" title="dom_content.js"]
+// Supondo que o HTML de dom_selection.html esteja carregado
+
+console.log("--- Alterando Conteúdo ---");
+
+// Seleciona o título
+const tituloH1 = document.getElementById('titulo-principal');
+if (tituloH1) {
+  console.log("Texto original do título:", tituloH1.innerText);
+  // Altera o texto visível
+  tituloH1.innerText = "Página de Manipulação DOM!";
+  console.log("Novo texto do título:", tituloH1.innerText);
+}
+
+// Seleciona o primeiro parágrafo
+const primeiroP = document.querySelector('.paragrafo.info');
+if (primeiroP) {
+  // Adiciona HTML usando innerHTML (USE COM CUIDADO!)
+  primeiroP.innerHTML = "Este parágrafo agora contém <strong>HTML</strong> inserido via <i>innerHTML</i>.";
+}
+
+// Seleciona o segundo parágrafo
+const segundoP = document.querySelector('.paragrafo.importante');
+if (segundoP) {
+    // Define o texto usando textContent (seguro)
+    segundoP.textContent = "Este é o novo texto usando textContent.";
+}
+
+// Seleciona o campo de input
+const campoNome = document.getElementById('campoNome');
+if (campoNome) {
+  console.log("Valor inicial do input:", campoNome.value);
+  // Altera o valor do input
+  campoNome.value = "Novo valor definido via JS";
+  console.log("Novo valor do input:", campoNome.value);
+}
+
+// Criando e adicionando um novo elemento
+const novaLi = document.createElement('li'); // Cria um <li>
+novaLi.innerText = "Item 4 (Adicionado)"; // Define o texto
+novaLi.classList.add('item', 'novo'); // Adiciona classes (veremos a seguir)
+
+const listaUl = document.querySelector('ul'); // Seleciona a lista <ul>
+if (listaUl) {
+  listaUl.appendChild(novaLi); // Adiciona o novo <li> ao final da <ul>
+  console.log("Novo item adicionado à lista.");
+}
+[/CODE_BLOCK]
+
+## Alterando estilos (`.style`)
+
+Você pode acessar e modificar estilos CSS inline de um elemento através da propriedade `elemento.style`.
+
+*   As propriedades CSS que contêm hífens (ex: `background-color`, `font-size`) são escritas em **camelCase** no JavaScript (ex: `backgroundColor`, `fontSize`).
+*   Os valores são atribuídos como **strings**. Para valores numéricos que precisam de unidade (como `px`, `em`, `%`), você deve incluir a unidade na string.
+
+[CODE_BLOCK lang="javascript" title="dom_style.js"]
+// Supondo que o HTML de dom_selection.html esteja carregado
+
+console.log("--- Alterando Estilos ---");
+
+const tituloEstilo = document.getElementById('titulo-principal');
+if (tituloEstilo) {
+  tituloEstilo.style.color = "purple"; // Muda a cor do texto
+  tituloEstilo.style.backgroundColor = "#f0f0f0"; // Muda o fundo (camelCase)
+  tituloEstilo.style.padding = "10px"; // Adiciona padding (com unidade)
+  tituloEstilo.style.borderBottom = "3px solid purple"; // Estilo da borda inferior
+}
+
+const paragrafoImportanteEstilo = document.querySelector('.paragrafo.importante');
+if (paragrafoImportanteEstilo) {
+  paragrafoImportanteEstilo.style.fontWeight = "bold"; // Negrito
+  paragrafoImportanteEstilo.style.fontSize = "1.2em"; // Tamanho da fonte relativo
+  paragrafoImportanteEstilo.style.margin = "20px 0"; // Margem vertical
+}
+
+// Esconder um elemento
+const paragrafoParaEsconder = document.querySelector('div p');
+if (paragrafoParaEsconder) {
+   // paragrafoParaEsconder.style.display = 'none'; // Remove do fluxo
+}
+[/CODE_BLOCK]
+
+**Observação:** Alterar estilos diretamente via `elemento.style` adiciona estilos *inline* ao elemento HTML (`<h1 style="...">`). Para mudanças mais complexas ou reutilizáveis, é geralmente **melhor prática adicionar ou remover classes CSS**, como veremos a seguir. Use `.style` para mudanças dinâmicas pontuais.
+
+## Adicionando e removendo classes (`classList.add`, `classList.remove`, `classList.toggle`)
+
+Manipular as classes CSS de um elemento é a forma preferida de alterar sua aparência de forma organizada e reutilizável. A propriedade `elemento.classList` oferece métodos convenientes para isso:
+
+*   **`elemento.classList.add('nomeDaClasse')`**: Adiciona uma ou mais classes (separadas por vírgula ou espaço) ao elemento.
+*   **`elemento.classList.remove('nomeDaClasse')`**: Remove uma ou mais classes do elemento.
+*   **`elemento.classList.toggle('nomeDaClasse')`**: Adiciona a classe se ela não existir, ou remove se ela já existir. Retorna `true` se a classe foi adicionada, `false` se foi removida. Útil para alternar estados (ex: menu ativo/inativo).
+*   **`elemento.classList.contains('nomeDaClasse')`**: Verifica se o elemento possui a classe especificada. Retorna `true` ou `false`.
+*   **`elemento.classList.replace('classeAntiga', 'classeNova')`**: Substitui uma classe existente por uma nova.
+
+[CODE_BLOCK lang="css" title="dom_classes.css"]
+/* Adicione este CSS ao seu HTML ou arquivo CSS separado */
+.ativo {
+  border: 2px solid green;
+  background-color: lightgreen;
+  font-weight: bold;
+}
+
+.erro {
+    color: red;
+    border: 1px dashed red;
+    padding: 5px;
+}
+
+.texto-grande {
+    font-size: 24px;
+}
+[/CODE_BLOCK]
+
+[CODE_BLOCK lang="html" title="dom_classes.html"]
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manipulação de Classes DOM</title>
+    <link rel="stylesheet" href="dom_classes.css"> <!-- Link para o CSS -->
+</head>
+<body>
+    <h1 id="meu-titulo">Título Interativo</h1>
+    <p id="paragrafo-status">Status inicial.</p>
+    <button id="botao-toggle">Alternar Destaque Título</button>
+    <button id="botao-erro">Marcar Parágrafo como Erro</button>
+    <button id="botao-reset">Resetar Estilos</button>
+
+    <script src="dom_classes.js"></script>
+</body>
+</html>
+[/CODE_BLOCK]
+
+[CODE_BLOCK lang="javascript" title="dom_classes.js"]
+console.log("--- Manipulando Classes ---");
+
+const titulo = document.getElementById('meu-titulo');
+const paragrafo = document.getElementById('paragrafo-status');
+const btnToggle = document.getElementById('botao-toggle');
+const btnErro = document.getElementById('botao-erro');
+const btnReset = document.getElementById('botao-reset');
+
+if (btnToggle && titulo) {
+  btnToggle.addEventListener('click', () => {
+    // Alterna a classe 'ativo' no título
+    const foiAdicionada = titulo.classList.toggle('ativo');
+    console.log(`Classe 'ativo' no título foi ${foiAdicionada ? 'ADICIONADA' : 'REMOVIDA'}`);
+  });
+}
+
+if (btnErro && paragrafo) {
+  btnErro.addEventListener('click', () => {
+    // Adiciona as classes 'erro' e 'texto-grande' ao parágrafo
+    paragrafo.classList.add('erro', 'texto-grande');
+    paragrafo.innerText = "Status: Erro encontrado!";
+    console.log("Classes 'erro' e 'texto-grande' adicionadas ao parágrafo.");
+    console.log("Classes atuais do parágrafo:", paragrafo.className); // Mostra todas as classes como string
+  });
+}
+
+if (btnReset && titulo && paragrafo) {
+  btnReset.addEventListener('click', () => {
+    // Remove classes específicas
+    titulo.classList.remove('ativo');
+    paragrafo.classList.remove('erro', 'texto-grande');
+    paragrafo.innerText = "Status resetado.";
+    console.log("Classes removidas.");
+
+    // Verificando se uma classe existe
+    if (!paragrafo.classList.contains('erro')) {
+        console.log("Parágrafo não contém mais a classe 'erro'.");
+    }
+  });
+}
+[/CODE_BLOCK]
+
+Usar `classList` é a maneira moderna e eficiente de gerenciar os estilos de um elemento dinamicamente através de classes CSS predefinidas.
+
+# 8. Eventos
+
+Eventos são ações ou ocorrências que acontecem no navegador, como um clique do mouse, o pressionar de uma tecla, o carregamento de uma página, a submissão de um formulário, etc. O JavaScript permite "escutar" (listen for) esses eventos e executar código em resposta a eles, tornando as páginas interativas.
+
+## Eventos comuns (`click`, `mouseover`, `keydown`, `keyup`, `submit`, `load`, `DOMContentLoaded`)
+
+Existem muitos tipos de eventos. Alguns dos mais comuns incluem:
+
+*   **Eventos de Mouse:**
+    *   `click`: Disparado quando o botão principal do mouse é clicado em um elemento.
+    *   `dblclick`: Disparado com um clique duplo.
+    *   `mouseover`: Disparado quando o ponteiro do mouse entra na área de um elemento.
+    *   `mouseout`: Disparado quando o ponteiro do mouse sai da área de um elemento.
+    *   `mousedown`: Disparado quando o botão do mouse é pressionado sobre um elemento.
+    *   `mouseup`: Disparado quando o botão do mouse é liberado sobre um elemento.
+    *   `mousemove`: Disparado quando o ponteiro do mouse se move sobre um elemento.
+*   **Eventos de Teclado:**
+    *   `keydown`: Disparado quando uma tecla é pressionada.
+    *   `keyup`: Disparado quando uma tecla é liberada.
+    *   `keypress`: Disparado quando uma tecla que produz um caractere é pressionada (menos usado hoje, `keydown` é mais comum).
+*   **Eventos de Formulário:**
+    *   `submit`: Disparado quando um formulário (`<form>`) é submetido (ex: clicando em `<button type="submit">`).
+    *   `change`: Disparado quando o valor de um elemento de formulário (`<input>`, `<select>`, `<textarea>`) muda e o elemento perde o foco.
+    *   `input`: Disparado imediatamente quando o valor de um `<input>` ou `<textarea>` muda.
+    *   `focus`: Disparado quando um elemento recebe foco.
+    *   `blur`: Disparado quando um elemento perde o foco.
+*   **Eventos de Janela/Documento:**
+    *   `load`: Disparado no objeto `window` quando a página inteira (incluindo todos os recursos como imagens e folhas de estilo) terminou de carregar.
+    *   `DOMContentLoaded`: Disparado no `document` quando o HTML foi completamente carregado e parseado, sem esperar por folhas de estilo e imagens. **Geralmente preferível ao `load`** para executar scripts que dependem do DOM.
+    *   `resize`: Disparado no `window` quando a janela do navegador é redimensionada.
+    *   `scroll`: Disparado no `window` (ou em elementos roláveis) quando o usuário rola a página.
+
+## Manipuladores de eventos (`addEventListener`)
+
+A maneira moderna e recomendada de lidar com eventos é usar o método `elemento.addEventListener()`.
+
+*   **Sintaxe:** `elemento.addEventListener('tipoDeEvento', funcaoCallback, [opcoes])`
+    *   `elemento`: O elemento HTML no qual você quer escutar o evento (selecionado via `getElementById`, `querySelector`, etc.).
+    *   `tipoDeEvento`: Uma string com o nome do evento (ex: `'click'`, `'mouseover'`, `'keydown'`) **sem** o prefixo "on".
+    *   `funcaoCallback`: A função que será executada quando o evento ocorrer. Essa função recebe automaticamente um objeto `event` como argumento, contendo informações sobre o evento.
+    *   `opcoes` (Opcional): Um objeto para configurações avançadas (raramente necessário para o básico).
+
+**Vantagens do `addEventListener`:**
+
+*   Permite adicionar múltiplos manipuladores para o mesmo evento no mesmo elemento.
+*   Oferece mais controle sobre a fase de captura/borbulhamento do evento (avançado).
+*   É o padrão moderno e mais organizado. (Evite usar atributos `onclick=""` no HTML ou `elemento.onclick = function() {}` no JS para código mais complexo).
+
+[CODE_BLOCK lang="html" title="events.html"]
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eventos JavaScript</title>
+    <style>
+        .caixa { width: 150px; height: 100px; background-color: lightcoral; margin: 10px; padding: 10px; border: 1px solid black; text-align: center; cursor: pointer;}
+        .caixa:hover { background-color: lightsalmon; }
+        #area-log { border: 1px solid #ccc; height: 150px; overflow-y: scroll; padding: 5px; font-size: 0.9em; margin-top: 10px;}
+    </style>
+</head>
+<body>
+    <h1>Manipulação de Eventos</h1>
+
+    <button id="meu-botao">Clique em Mim!</button>
+    <div id="caixa-interativa" class="caixa">Passe o mouse aqui</div>
+
+    <form id="meu-formulario">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <label for="teclado">Digite algo:</label>
+    <input type="text" id="teclado">
+    <p id="texto-digitado"></p>
+
+    <div id="area-log">Logs de eventos aparecerão aqui...</div>
+
+    <script src="events.js"></script>
+</body>
+</html>
+[/CODE_BLOCK]
+
+[CODE_BLOCK lang="javascript" title="events.js"]
+console.log("Script de eventos carregado.");
+
+// Selecionando elementos
+const botao = document.getElementById('meu-botao');
+const caixa = document.getElementById('caixa-interativa');
+const formulario = document.getElementById('meu-formulario');
+const inputNome = document.getElementById('nome');
+const inputTeclado = document.getElementById('teclado');
+const textoDigitado = document.getElementById('texto-digitado');
+const areaLog = document.getElementById('area-log');
+
+// Função para adicionar logs na área designada
+function logEvento(mensagem) {
+    console.log(mensagem); // Log no console do navegador
+    const agora = new Date().toLocaleTimeString();
+    areaLog.innerHTML += `[${agora}] ${mensagem}<br>`; // Adiciona ao log na página
+    areaLog.scrollTop = areaLog.scrollHeight; // Rola para o fim
+}
+
+// --- Adicionando Event Listeners ---
+
+// Evento de Clique no Botão
+if (botao) {
+    botao.addEventListener('click', function(evento) {
+        // 'evento' ou 'event' é o objeto do evento
+        logEvento(`Botão clicado! Tipo: ${evento.type}`);
+        // 'this' dentro de uma função normal aqui refere-se ao elemento (botao)
+        this.innerText = 'Clicado!';
+        setTimeout(() => this.innerText = 'Clique em Mim!', 1000); // Restaura texto
+    });
+}
+
+// Eventos de Mouse na Caixa
+if (caixa) {
+    caixa.addEventListener('mouseover', (evento) => {
+        // Usando arrow function, 'this' NÃO seria a caixa aqui.
+        // Usamos 'evento.target' para referenciar o elemento alvo.
+        logEvento(`Mouse sobre a caixa (target: ${evento.target.id})`);
+        evento.target.style.borderColor = 'blue';
+    });
+
+    caixa.addEventListener('mouseout', (evento) => {
+        logEvento(`Mouse fora da caixa (target: ${evento.target.id})`);
+        evento.target.style.borderColor = 'black'; // Restaura borda
+    });
+}
+
+// Evento de Submissão do Formulário
+if (formulario) {
+    formulario.addEventListener('submit', function(event) {
+        logEvento(`Formulário submetido!`);
+
+        // Previne o comportamento padrão do navegador (recarregar a página)
+        event.preventDefault();
+
+        // Podemos pegar os dados do formulário aqui
+        const nomeValor = inputNome ? inputNome.value : 'N/A';
+        logEvento(`Valor do campo nome: ${nomeValor}`);
+
+        // Simular envio ou processamento...
+        alert(`Formulário enviado com o nome: ${nomeValor}`);
+        // this.reset(); // Limpa o formulário (opcional)
+    });
+}
+
+// Evento de Teclado no Input
+if (inputTeclado && textoDigitado) {
+    inputTeclado.addEventListener('keyup', function(event) {
+        // event.key contém a tecla pressionada
+        // event.code contém o código físico da tecla
+        logEvento(`Tecla liberada: ${event.key} (Código: ${event.code})`);
+        textoDigitado.innerText = `Você digitou: ${this.value}`; // 'this' é o inputTeclado
+    });
+}
+
+// Evento DOMContentLoaded (executa quando o HTML está pronto)
+document.addEventListener('DOMContentLoaded', () => {
+    logEvento("Evento: DOMContentLoaded - HTML pronto!");
+});
+
+// Evento Load (executa quando tudo, incluindo imagens, carregou)
+window.addEventListener('load', () => {
+    logEvento("Evento: window load - Página completamente carregada!");
+});
+[/CODE_BLOCK]
+
+## Evento de submissão de formulários e prevenção de comportamento padrão (`event.preventDefault`)
+
+Como visto no exemplo acima, o objeto `event` que é passado para a função callback do `addEventListener` contém informações úteis sobre o evento.
+
+Uma das funções mais importantes desse objeto é `event.preventDefault()`. Ela **impede** que o navegador execute a ação padrão associada àquele evento.
+
+*   No caso de um evento `submit` em um formulário, a ação padrão é enviar os dados para a URL definida no atributo `action` do formulário e recarregar a página. Usar `event.preventDefault()` impede isso, permitindo que você, por exemplo, valide os dados com JavaScript, envie-os usando Fetch API (ver Seção 11) sem recarregar a página, e mostre uma mensagem de sucesso/erro dinamicamente.
+*   No caso de um clique em um link (`<a>`), `event.preventDefault()` impediria o navegador de navegar para o `href` do link.
+
+É fundamental usar `event.preventDefault()` em manipuladores de `submit` quando você quer controlar o envio do formulário com JavaScript.
+
+# 9. Trabalhando com Arrays e Objetos
+
+Arrays e Objetos são estruturas de dados essenciais em JavaScript para armazenar coleções de valores e dados relacionados.
+
+## Criando e manipulando arrays
+
+Arrays são listas ordenadas de itens.
+
+*   **Criação:**
+    *   Literal: `let meuArray = [item1, item2, item3];` (preferido)
+    *   Construtor: `let outroArray = new Array(item1, item2);` ou `new Array(tamanho)`
+*   **Acesso:** Pelo índice (base 0): `meuArray[0]` acessa o primeiro item.
+*   **Tamanho:** Propriedade `.length`: `meuArray.length` retorna o número de itens.
+*   **Modificação:** Atribuição direta ao índice: `meuArray[1] = novoValor;`
+
+[CODE_BLOCK lang="javascript" title="arrays_creation.js"]
+// Criação
+let cores = ["vermelho", "verde", "azul"];
+let numerosVazio = [];
+let mix = [1, "dois", true, null, { id: 3 }];
+let numerosFixos = new Array(5); // Cria array com 5 posições vazias (undefined)
+let numerosCopia = new Array(10, 20, 30); // Igual a [10, 20, 30]
+
+console.log("Cores:", cores);
+console.log("Primeira cor:", cores[0]); // "vermelho"
+console.log("Tamanho de cores:", cores.length); // 3
+console.log("Última cor:", cores[cores.length - 1]); // "azul"
+console.log("Array vazio:", numerosVazio);
+console.log("Array misto:", mix);
+console.log("Array tamanho fixo:", numerosFixos); // [ <5 empty items> ]
+
+// Modificação
+cores[1] = "amarelo"; // Substitui "verde"
+console.log("Cores modificado:", cores); // ["vermelho", "amarelo", "azul"]
+
+cores[3] = "preto"; // Adiciona um novo elemento na posição 3
+console.log("Cores com adição:", cores); // ["vermelho", "amarelo", "azul", "preto"]
+console.log("Novo tamanho:", cores.length); // 4
+
+// Adicionar muito além (cria posições vazias)
+cores[6] = "branco";
+console.log("Cores com salto:", cores); // [ 'vermelho', 'amarelo', 'azul', 'preto', <2 empty items>, 'branco' ]
+console.log("Tamanho após salto:", cores.length); // 7
+[/CODE_BLOCK]
+
+## Métodos principais: `push`, `pop`, `shift`, `unshift`, `splice`, `slice`
+
+Arrays possuem muitos métodos úteis para manipulação:
+
+*   **`push(item1, item2, ...)`**: Adiciona um ou mais itens ao **final** do array. Retorna o novo tamanho do array. (Modifica o original)
+*   **`pop()`**: Remove o **último** item do array. Retorna o item removido. (Modifica o original)
+*   **`unshift(item1, item2, ...)`**: Adiciona um ou mais itens ao **início** do array. Retorna o novo tamanho do array. (Modifica o original)
+*   **`shift()`**: Remove o **primeiro** item do array. Retorna o item removido. (Modifica o original)
+*   **`splice(indiceInicio, qtdRemover, item1Adicionar, item2Adicionar, ...)`**: Método poderoso para adicionar/remover itens em **qualquer posição**.
+    *   `indiceInicio`: O índice onde começar a alteração.
+    *   `qtdRemover`: Quantidade de itens a remover a partir do `indiceInicio`.
+    *   `item1Adicionar...` (opcional): Itens a serem adicionados no `indiceInicio` após a remoção.
+    *   Retorna um array com os itens removidos. (Modifica o original)
+*   **`slice(indiceInicio, indiceFim)`**: Cria uma **cópia superficial** (um novo array) de uma parte do array original.
+    *   `indiceInicio`: Índice onde começa a cópia (inclusivo).
+    *   `indiceFim` (opcional): Índice onde termina a cópia (exclusivo). Se omitido, vai até o final do array.
+    *   **Não** modifica o array original.
+*   **`concat(outroArray1, outroArray2, ...)`**: Cria um **novo array** juntando o array original com outros arrays ou valores passados como argumento. (Não modifica o original)
+*   **`indexOf(item, inicioBusca)`**: Retorna o **primeiro índice** onde `item` é encontrado no array (usando igualdade estrita `===`), ou `-1` se não for encontrado. `inicioBusca` é opcional.
+*   **`includes(item, inicioBusca)`**: Verifica se o array contém o `item`. Retorna `true` ou `false`. Mais simples que `indexOf` para apenas checar a existência.
+
+[CODE_BLOCK lang="javascript" title="array_methods_manipulation.js"]
+let letras = ['a', 'b', 'c'];
+console.log("Original:", letras);
+
+// push
+let novoTamanhoPush = letras.push('d', 'e');
+console.log("Após push('d', 'e'):", letras); // ['a', 'b', 'c', 'd', 'e']
+console.log("Novo tamanho (push):", novoTamanhoPush); // 5
+
+// pop
+let itemRemovidoPop = letras.pop();
+console.log("Após pop():", letras); // ['a', 'b', 'c', 'd']
+console.log("Item removido (pop):", itemRemovidoPop); // 'e'
+
+// unshift
+let novoTamanhoUnshift = letras.unshift('x', 'y');
+console.log("Após unshift('x', 'y'):", letras); // ['x', 'y', 'a', 'b', 'c', 'd']
+console.log("Novo tamanho (unshift):", novoTamanhoUnshift); // 6
+
+// shift
+let itemRemovidoShift = letras.shift();
+console.log("Após shift():", letras); // ['y', 'a', 'b', 'c', 'd']
+console.log("Item removido (shift):", itemRemovidoShift); // 'x'
+
+// splice (remover)
+let letrasParaSplice = ['p', 'q', 'r', 's', 't'];
+console.log("\nOriginal para Splice:", letrasParaSplice);
+let removidosSplice = letrasParaSplice.splice(1, 2); // Remove 2 itens a partir do índice 1 ('q', 'r')
+console.log("Após splice(1, 2):", letrasParaSplice); // ['p', 's', 't']
+console.log("Itens removidos (splice):", removidosSplice); // ['q', 'r']
+
+// splice (adicionar/substituir)
+let adicionadosSplice = letrasParaSplice.splice(1, 0, 'B', 'C'); // Remove 0, adiciona 'B', 'C' no índice 1
+console.log("Após splice(1, 0, 'B', 'C'):", letrasParaSplice); // ['p', 'B', 'C', 's', 't']
+console.log("Itens removidos (splice add):", adicionadosSplice); // [] (nenhum removido)
+
+let substituidosSplice = letrasParaSplice.splice(3, 1, 'S'); // Remove 1 ('s'), adiciona 'S' no índice 3
+console.log("Após splice(3, 1, 'S'):", letrasParaSplice); // ['p', 'B', 'C', 'S', 't']
+console.log("Itens removidos (splice replace):", substituidosSplice); // ['s']
+
+// slice (copiar parte)
+let alfabeto = ['a', 'b', 'c', 'd', 'e', 'f'];
+console.log("\nOriginal para Slice:", alfabeto);
+let parteSlice = alfabeto.slice(1, 4); // Pega do índice 1 (inclusivo) até 4 (exclusivo) -> b, c, d
+console.log("Slice(1, 4):", parteSlice); // ['b', 'c', 'd']
+let finalSlice = alfabeto.slice(3); // Pega do índice 3 até o final -> d, e, f
+console.log("Slice(3):", finalSlice); // ['d', 'e', 'f']
+console.log("Original AINDA INTACTO:", alfabeto); // ['a', 'b', 'c', 'd', 'e', 'f']
+
+// concat
+let arr1 = [1, 2];
+let arr2 = [3, 4];
+let arr3 = [5, 6];
+let arrConcatenado = arr1.concat(arr2, arr3, 7); // Junta todos
+console.log("\nConcat:", arrConcatenado); // [ 1, 2, 3, 4, 5, 6, 7 ]
+console.log("Originais intactos:", arr1, arr2, arr3);
+
+// indexOf e includes
+let nomesIdx = ["Ana", "Bia", "Caio", "Bia"];
+console.log("\nIndexOf 'Bia':", nomesIdx.indexOf("Bia")); // 1 (primeira ocorrência)
+console.log("IndexOf 'Zoe':", nomesIdx.indexOf("Zoe")); // -1 (não encontrado)
+console.log("Includes 'Caio':", nomesIdx.includes("Caio")); // true
+console.log("Includes 'Duda':", nomesIdx.includes("Duda")); // false
+[/CODE_BLOCK]
+
+## Criando objetos (`{ chave: valor }`)
+
+Objetos são coleções não ordenadas de pares chave-valor.
+
+*   **Criação:**
+    *   Literal: `let meuObjeto = { chave1: valor1, chave2: valor2 };` (preferido)
+    *   Construtor: `let outroObjeto = new Object(); outroObjeto.chave = valor;` (menos comum)
+*   **Acesso:**
+    *   Notação de ponto: `meuObjeto.chave1`
+    *   Notação de colchetes: `meuObjeto['chave1']` (útil quando a chave é uma variável ou contém caracteres especiais).
+*   **Modificação/Adição:** Atribuição direta: `meuObjeto.chave1 = novoValor;` ou `meuObjeto.novaChave = valorNovo;`
+*   **Remoção:** Operador `delete`: `delete meuObjeto.chave1;`
+
+[CODE_BLOCK lang="javascript" title="objects.js"]
+// Criação Literal
+let livro = {
+  titulo: "O Guia do Mochileiro das Galáxias",
+  autor: "Douglas Adams",
+  ano: 1979,
+  genero: "Ficção Científica",
+  'numero-paginas': 208 // Chave com hífen requer aspas
+};
+
+console.log("Livro:", livro);
+
+// Acesso
+console.log("Autor:", livro.autor); // Douglas Adams
+console.log("Gênero:", livro['genero']); // Ficção Científica
+console.log("Páginas:", livro['numero-paginas']); // Colchetes necessários
+
+// Modificação
+livro.ano = 1980; // Corrigindo o ano?
+console.log("Ano corrigido:", livro.ano);
+
+// Adição
+livro.editora = "Editora Arqueiro";
+livro.disponivel = true;
+console.log("Livro com adição:", livro);
+
+// Chave com variável
+let propriedade = "titulo";
+console.log("Acesso com variável:", livro[propriedade]); // O Guia do Mochileiro das Galáxias
+
+// Remoção
+delete livro.genero;
+console.log("Livro sem gênero:", livro);
+
+// Verificando se propriedade existe
+console.log("Tem 'autor'?", 'autor' in livro); // true
+console.log("Tem 'genero'?", 'genero' in livro); // false
+console.log("Tem 'disponivel'?", livro.hasOwnProperty('disponivel')); // true (verifica só no próprio objeto)
+[/CODE_BLOCK]
+
+## Percorrendo arrays e objetos com `for...in` e `for...of`
+
+Existem laços específicos para iterar sobre estruturas de dados:
+
+*   **`for...of` (ES6):** Itera sobre os **valores** de objetos *iteráveis* (como Arrays, Strings, Maps, Sets, NodeList). **É a forma preferida para iterar sobre os elementos de um array.**
+
+*   **`for...in`**: Itera sobre as **chaves** (nomes das propriedades) enumeráveis de um objeto. Pode ser usado em arrays (iterará sobre os índices como strings), mas **não é recomendado** para arrays, pois pode iterar sobre propriedades inesperadas (incluindo as do protótipo) e a ordem não é garantida. **Use `for...in` principalmente para iterar sobre as propriedades de objetos simples.**
+
+[CODE_BLOCK lang="javascript" title="for_in_of.js"]
+// for...of com Array (preferido)
+const frutasIter = ['Maçã', 'Pera', 'Uva'];
+console.log("--- for...of com Array ---");
+for (const fruta of frutasIter) {
+  console.log(`Fruta: ${fruta}`);
+}
+
+// for...of com String
+const palavra = "Alo";
+console.log("\n--- for...of com String ---");
+for (const letra of palavra) {
+  console.log(`Letra: ${letra}`);
+}
+
+// for...in com Objeto (uso principal)
+const carroIter = { marca: 'Fiat', modelo: 'Uno', ano: 2010 };
+console.log("\n--- for...in com Objeto ---");
+for (const chave in carroIter) {
+  // Verifica se a propriedade é do próprio objeto (não herdada do prototype)
+  if (Object.hasOwnProperty.call(carroIter, chave)) {
+    console.log(`Chave: ${chave}, Valor: ${carroIter[chave]}`);
+  }
+}
+
+// for...in com Array (NÃO RECOMENDADO)
+const numerosIter = [10, 20, 30];
+numerosIter.extra = 'propriedade extra'; // Adicionando propriedade não-índice
+console.log("\n--- for...in com Array (NÃO RECOMENDADO!) ---");
+for (const indice in numerosIter) {
+  console.log(`Índice/Chave: ${indice}, Valor: ${numerosIter[indice]}, Tipo: ${typeof indice}`);
+  // Note que o índice é uma STRING! E 'extra' também aparece.
+}
+[/CODE_BLOCK]
+
+**Para iterar sobre objetos, você também pode usar:**
+
+*   `Object.keys(obj)`: Retorna um array com as chaves do objeto.
+*   `Object.values(obj)`: Retorna um array com os valores do objeto.
+*   `Object.entries(obj)`: Retorna um array de arrays `[chave, valor]`.
+
+Depois, você pode usar `forEach` ou `for...of` nesses arrays resultantes.
+
+[CODE_BLOCK lang="javascript" title="object_iteration_methods.js"]
+const pessoaIter = { nome: 'Laura', idade: 29, cidade: 'Curitiba' };
+
+console.log("\n--- Object.keys() ---");
+const chaves = Object.keys(pessoaIter);
+console.log(chaves); // ['nome', 'idade', 'cidade']
+chaves.forEach(chave => {
+  console.log(`${chave}: ${pessoaIter[chave]}`);
+});
+
+console.log("\n--- Object.values() ---");
+const valores = Object.values(pessoaIter);
+console.log(valores); // ['Laura', 29, 'Curitiba']
+for(const valor of valores) {
+    console.log(`Valor: ${valor}`);
+}
+
+console.log("\n--- Object.entries() ---");
+const entradas = Object.entries(pessoaIter);
+console.log(entradas); // [ ['nome', 'Laura'], ['idade', 29], ['cidade', 'Curitiba'] ]
+for (const [chave, valor] of entradas) { // Desestruturação do array [chave, valor]
+  console.log(`${chave} -> ${valor}`);
+}
+[/CODE_BLOCK]
+
+# 10. JSON e Armazenamento Local
+
+JSON é um formato leve de troca de dados, e Armazenamento Local permite guardar dados no navegador do usuário.
+
+## Estrutura do JSON
+
+**JSON (JavaScript Object Notation)** é um formato de texto padrão para representar dados estruturados, baseado na sintaxe de objetos JavaScript. É muito usado para troca de dados entre cliente (navegador) e servidor (API).
+
+*   Consiste em pares chave-valor.
+*   **Chaves**: Sempre strings entre aspas duplas (`"`).
+*   **Valores**: Podem ser:
+    *   `string` (entre aspas duplas)
+    *   `number` (inteiro ou decimal)
+    *   `boolean` (`true` ou `false` - sem aspas)
+    *   `null` (sem aspas)
+    *   `array` (usando colchetes `[]`, valores seguem as regras JSON)
+    *   Outro `objeto` JSON (usando chaves `{}`)
+*   **Não suporta:** Funções, `undefined`, comentários, vírgula no final do último elemento.
+
+[CODE_BLOCK lang="json" title="exemplo.json"]
+{
+  "nome": "Exemplo de Produto",
+  "id": 12345,
+  "ativo": true,
+  "preco": 49.99,
+  "tags": ["eletronico", "audio", "promocao"],
+  "dimensoes": {
+    "altura": 10.5,
+    "largura": 20.0,
+    "profundidade": 5.0
+  },
+  "fornecedor": null
+}
+[/CODE_BLOCK]
+
+## Convertendo JSON para objeto e vice-versa (`JSON.parse`, `JSON.stringify`)
+
+JavaScript fornece métodos no objeto global `JSON` para trabalhar com dados nesse formato:
+
+*   **`JSON.stringify(objetoJavaScript)`**: Converte um objeto ou valor JavaScript em uma **string JSON**.
+    *   Propriedades com valor `undefined`, funções ou Symbols são omitidas.
+
+*   **`JSON.parse(stringJSON)`**: Analisa uma **string JSON** e a converte em um objeto ou valor JavaScript correspondente.
+    *   Lança um erro (`SyntaxError`) se a string JSON for inválida.
+
+[CODE_BLOCK lang="javascript" title="json_parse_stringify.js"]
+const produtoObj = {
+  nome: "Fone de Ouvido Bluetooth",
+  id: 987,
+  emEstoque: true,
+  preco: 199.90,
+  cores: ["preto", "branco"],
+  especificacoes: {
+    bateria: "10h",
+    cancelamentoRuido: true
+  },
+  dataLancamento: undefined, // Será omitido no stringify
+  getInfo: function() { return this.nome; } // Será omitido no stringify
+};
+
+console.log("Objeto Original:", produtoObj);
+
+// Convertendo objeto para string JSON
+const produtoJSON = JSON.stringify(produtoObj, null, 2); // null, 2 para formatação bonita (indentação)
+console.log("\nString JSON gerada:");
+console.log(produtoJSON);
+console.log("Tipo da string JSON:", typeof produtoJSON); // string
+
+// Convertendo string JSON de volta para objeto
+try {
+  const produtoObjRecriado = JSON.parse(produtoJSON);
+  console.log("\nObjeto recriado a partir do JSON:", produtoObjRecriado);
+  console.log("Tipo do objeto recriado:", typeof produtoObjRecriado); // object
+  console.log("Acesso à propriedade:", produtoObjRecriado.especificacoes.bateria); // "10h"
+  // Note que dataLancamento e getInfo não existem no objeto recriado
+  console.log("Data Lançamento Recriada:", produtoObjRecriado.dataLancamento); // undefined
+
+} catch (erro) {
+  console.error("\nErro ao fazer parse do JSON:", erro);
+}
+
+// Exemplo de JSON inválido
+const jsonInvalido = '{ "nome": "Teste", "idade": 30, }'; // Vírgula extra no final
+try {
+  JSON.parse(jsonInvalido);
+} catch (erro) {
+  console.error("\nErro esperado ao parsear JSON inválido:", erro.message);
+}
+[/CODE_BLOCK]
+
+## Armazenando dados no `localStorage` e `sessionStorage`
+
+Web Storage API (`localStorage` e `sessionStorage`) permite que sites e aplicativos web armazenem dados (pares chave-valor) **diretamente no navegador do usuário**.
+
+*   **Importante:** Ambos armazenam dados apenas como **strings**. Se você quiser guardar objetos ou arrays, precisa convertê-los para string JSON antes (`JSON.stringify`) e fazer o parse (`JSON.parse`) ao recuperar.
+*   **`localStorage`**:
+    *   Armazena dados **sem data de expiração**. Os dados persistem mesmo após fechar o navegador ou reiniciar o computador.
+    *   Os dados são específicos da **origem** (protocolo, domínio, porta). Um site não pode acessar o `localStorage` de outro.
+    *   Limite de armazenamento (geralmente 5-10MB por origem).
+    *   **Métodos:**
+        *   `localStorage.setItem('chave', 'valorString')`: Armazena um item.
+        *   `localStorage.getItem('chave')`: Recupera o valor (retorna `null` se a chave não existir).
+        *   `localStorage.removeItem('chave')`: Remove um item.
+        *   `localStorage.clear()`: Remove todos os itens da origem.
+        *   `localStorage.length`: Número de itens armazenados.
+        *   `localStorage.key(index)`: Obtém a chave no índice especificado.
+
+*   **`sessionStorage`**:
+    *   Funciona exatamente como `localStorage` (mesmos métodos), mas armazena dados apenas pela **duração da sessão da página**.
+    *   Os dados são **limpos** quando a aba ou janela do navegador é fechada.
+    *   Útil para dados temporários que não precisam persistir indefinidamente (ex: estado de um formulário multi-etapas).
+
+[CODE_BLOCK lang="javascript" title="web_storage.js"]
+// --- localStorage ---
+console.log("--- localStorage ---");
+
+// Armazenando strings
+localStorage.setItem('nomeUsuario', 'Carlos');
+localStorage.setItem('temaPreferido', 'dark');
+
+// Recuperando strings
+const usuario = localStorage.getItem('nomeUsuario');
+const tema = localStorage.getItem('temaPreferido');
+console.log(`Usuário recuperado: ${usuario} (Tipo: ${typeof usuario})`);
+console.log(`Tema recuperado: ${tema}`);
+
+// Armazenando objeto (precisa converter para JSON)
+const preferencias = { notificacoes: true, idioma: 'pt-br' };
+localStorage.setItem('prefsUsuario', JSON.stringify(preferencias));
+
+// Recuperando objeto (precisa fazer parse do JSON)
+const prefsSalvasString = localStorage.getItem('prefsUsuario');
+let prefsRecuperadas = null;
+if (prefsSalvasString) {
+  try {
+    prefsRecuperadas = JSON.parse(prefsSalvasString);
+    console.log("Preferências recuperadas (objeto):", prefsRecuperadas);
+    console.log("Notificações:", prefsRecuperadas.notificacoes);
+  } catch (e) {
+    console.error("Erro ao fazer parse das preferências salvas:", e);
+  }
+} else {
+    console.log("Nenhuma preferência salva encontrada.");
+}
+
+// Removendo um item
+localStorage.removeItem('temaPreferido');
+console.log("Tema após remoção:", localStorage.getItem('temaPreferido')); // null
+
+// Verificando o número de itens
+console.log("Itens no localStorage:", localStorage.length);
+
+// Limpando tudo (descomente para testar)
+// localStorage.clear();
+// console.log("Itens após clear():", localStorage.length);
+
+
+// --- sessionStorage ---
+console.log("\n--- sessionStorage ---");
+
+// Armazena um dado temporário
+sessionStorage.setItem('idSessao', 'xyz789');
+const idSessao = sessionStorage.getItem('idSessao');
+console.log("ID da Sessão:", idSessao);
+
+// Tente fechar e reabrir a aba/navegador e rodar este código novamente.
+// O valor de 'idSessao' terá desaparecido, mas 'nomeUsuario' do localStorage ainda estará lá.
+[/CODE_BLOCK]
+
+`localStorage` é ótimo para guardar preferências do usuário, tokens de autenticação (com cuidado!), ou dados offline simples. `sessionStorage` é bom para dados de sessão voláteis.
+
+# 11. Introdução a Promises e Assincronismo (Continuação)
+
+## Introdução a Promises (`new Promise`, `.then`, `.catch`, `.finally`) (Continuação)
+
+**Criando uma Promise:** (Geralmente feito por APIs que retornam Promises, mas você pode criar as suas)
+
+[CODE_BLOCK lang="javascript" title="promises_creation.js"]
+const minhaPrimeiraPromise = new Promise((resolve, reject) => {
+  // Lógica assíncrona aqui (ex: setTimeout, fetch)
+  console.log("Executando a lógica da Promise...");
+  setTimeout(() => { // Simula uma operação demorada
+    let sucesso = Math.random() > 0.4; // Simula sucesso ~60% das vezes
+    if (sucesso) {
+      console.log("Promise resolvida!");
+      resolve({ dados: "Informação importante!", status: 200 }); // Chama resolve com o valor em caso de sucesso
+    } else {
+      console.log("Promise rejeitada!");
+      reject(new Error("Falha ao buscar dados (simulado).")); // Chama reject com um erro em caso de falha
+    }
+  }, 1500); // Espera 1.5 segundos
+});
+[/CODE_BLOCK]
+
+**Consumindo uma Promise:** Usa-se os métodos `.then()`, `.catch()`, e `.finally()`.
+
+*   **`.then(onFulfilled, onRejected)`**:
+    *   `onFulfilled`: Função callback que será executada se a Promise for **resolvida** (fulfilled). Recebe o valor resolvido como argumento.
+    *   `onRejected` (opcional): Função callback que será executada se a Promise for **rejeitada** (rejected). Recebe o motivo da rejeição (erro) como argumento.
+    *   `.then()` **retorna uma nova Promise**, permitindo encadear múltiplas operações assíncronas (`Promise Chaining`).
+
+*   **`.catch(onRejected)`**: Um atalho para `.then(undefined, onRejected)`. Usado especificamente para tratar erros (rejeições) da Promise ou de qualquer `.then()` anterior na cadeia. É a forma **recomendada** para tratamento de erros.
+
+*   **`.finally(onFinally)`**: Função callback que será executada **independentemente** se a Promise foi resolvida ou rejeitada. Útil para código de limpeza (ex: esconder um spinner de loading).
+
+[CODE_BLOCK lang="javascript" title="promises_consuming.js"]
+console.log("Consumindo a Promise...");
+
+minhaPrimeiraPromise // Usa a Promise definida no bloco anterior
+  .then(
+    // Função onFulfilled (para sucesso)
+    (resultado) => {
+      console.log("SUCESSO! Dados recebidos:", resultado);
+      // Podemos retornar um novo valor ou outra Promise daqui
+      // para encadear mais operações .then()
+      return `Processado: ${resultado.dados.toUpperCase()}`;
+    }
+    // Não vamos tratar o erro aqui, usaremos .catch()
+  )
+  .then(
+      // Este .then() recebe o valor retornado pelo .then() anterior
+      (dadosProcessados) => {
+          console.log("Segundo then:", dadosProcessados);
+          // Simular outra operação que pode falhar
+          if (Math.random() < 0.2) {
+              // Lança um erro, que será pego pelo .catch()
+              throw new Error("Erro simulado no segundo then!");
+          }
+          return "Tudo certo no segundo then";
+      }
+  )
+  .catch(
+    // Função onRejected (para falha em qualquer ponto anterior)
+    (erro) => {
+      console.error("ERRO (no catch):", erro.message);
+      // Tratar o erro aqui (mostrar mensagem ao usuário, etc.)
+    }
+  )
+  .finally(
+    // Executa sempre, após sucesso ou falha
+    () => {
+      console.log("FINALLY: Operação finalizada (com sucesso ou falha).");
+      // Ex: esconder loading spinner
+    }
+  );
+
+console.log("Promise iniciada, mas o código continua executando..."); // Mostra como é assíncrono
+[/CODE_BLOCK]
+
+O encadeamento (`.then().then().catch().finally()`) torna o código assíncrono muito mais linear e legível do que o Callback Hell.
+
+## `async` e `await`
+
+Introduzidos no ES2017 (ES8), `async` e `await` são "açúcar sintático" (syntax sugar) construídos em cima das Promises, tornando o código assíncrono ainda mais parecido com código síncrono, o que melhora muito a legibilidade.
+
+*   **`async function`**: A palavra-chave `async` antes de `function` indica que a função **sempre retornará uma Promise**. Se a função retornar um valor explicitamente, a Promise será resolvida com esse valor. Se a função lançar um erro, a Promise será rejeitada com esse erro.
+
+*   **`await`**: A palavra-chave `await` só pode ser usada **dentro** de uma `async function`. Ela pausa a execução da função `async` até que a Promise à direita do `await` seja resolvida ou rejeitada.
+    *   Se a Promise for resolvida, `await` retorna o valor resolvido.
+    *   Se a Promise for rejeitada, `await` lança o erro (que pode ser capturado por um `try...catch`).
+
+[CODE_BLOCK lang="javascript" title="async_await.js"]
+// Função que retorna uma Promise (simulando busca de dados)
+function buscarDadosSimulados(id) {
+  console.log(`ASYNC: Buscando dados para ID ${id}...`);
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (id === 1) {
+        resolve({ id: 1, nome: "Produto A", preco: 50 });
+      } else if (id === 2) {
+         resolve({ id: 2, nome: "Produto B", preco: 100 });
+      }
+      else {
+        reject(new Error(`Dados não encontrados para ID ${id}`));
+      }
+    }, 1000); // Simula 1 segundo de espera
+  });
+}
+
+// Função assíncrona usando async/await
+async function processarDadosProduto(produtoId) {
+  console.log(`ASYNC: Iniciando processamento para ID ${produtoId}...`);
+  try {
+    // Pausa aqui até buscarDadosSimulados(produtoId) resolver
+    const produto = await buscarDadosSimulados(produtoId);
+    console.log("ASYNC: Produto encontrado:", produto);
+
+    // Simula outra operação assíncrona dependente da primeira
+    console.log("ASYNC: Verificando estoque...");
+    const estoqueDisponivel = await verificarEstoqueSimulado(produto.id); // Outra Promise
+    console.log(`ASYNC: Estoque para ${produto.nome}: ${estoqueDisponivel ? 'Disponível' : 'Indisponível'}`);
+
+    if(estoqueDisponivel) {
+        console.log("ASYNC: Processamento concluído com sucesso!");
+        return `Status OK para ${produto.nome}`; // Valor que a Promise retornada por processarDadosProduto resolverá
+    } else {
+        throw new Error(`Produto ${produto.nome} fora de estoque!`); // Rejeita a Promise
+    }
+
+  } catch (erro) {
+    // Captura erros de qualquer await rejeitado ou 'throw' dentro do try
+    console.error("ASYNC: Erro durante o processamento:", erro.message);
+    // A Promise retornada por processarDadosProduto será rejeitada com este erro
+    throw erro; // Opcional: relançar o erro se quiser que quem chamou trate também
+  } finally {
+      console.log(`ASYNC: Limpeza final para ID ${produtoId}.`);
+  }
+}
+
+// Função auxiliar simulada que retorna uma Promise
+function verificarEstoqueSimulado(id) {
+    return new Promise(resolve => {
+        // Simula uma verificação de estoque que leva 500ms
+        setTimeout(() => resolve(Math.random() > 0.3), 500); // Resolve true ~70%
+    });
+}
+
+// Chamando a função async e tratando a Promise resultante
+console.log("Chamando processarDadosProduto(1)...");
+processarDadosProduto(1)
+  .then(statusFinal => console.log("Resultado final (ID 1):", statusFinal))
+  .catch(erro => console.error("Erro capturado fora (ID 1):", erro.message));
+
+// Chamando com um ID que causa erro na busca inicial
+setTimeout(() => {
+    console.log("\nChamando processarDadosProduto(3)...");
+    processarDadosProduto(3)
+      .then(statusFinal => console.log("Resultado final (ID 3):", statusFinal)) // Não deve executar
+      .catch(erro => console.error("Erro capturado fora (ID 3):", erro.message));
+}, 3000); // Espera um pouco para não misturar os logs
+[/CODE_BLOCK]
+
+`async/await` simplifica drasticamente o fluxo de código assíncrono, tornando-o quase tão fácil de ler quanto código síncrono, enquanto ainda utiliza Promises por baixo dos panos.
+
+## Fetch API para requisições HTTP
+
+A **Fetch API** é a interface moderna do JavaScript para fazer requisições de rede (HTTP), como buscar dados de uma API externa. Ela é baseada em Promises.
+
+*   **`fetch(url, [opcoes])`**: Inicia a requisição.
+    *   `url`: A URL do recurso que você quer buscar.
+    *   `opcoes` (opcional): Um objeto para configurar a requisição (método - GET, POST, PUT, DELETE; cabeçalhos - headers; corpo da requisição - body; etc.). Por padrão, faz uma requisição GET.
+*   **Retorno:** `fetch` retorna uma **Promise** que resolve para um objeto **`Response`** assim que os *cabeçalhos* da resposta são recebidos (não o corpo completo).
+*   **Lendo o Corpo da Resposta:** O objeto `Response` tem métodos para ler o corpo da resposta, que também retornam Promises:
+    *   `response.json()`: Lê o corpo como JSON e faz o parse.
+    *   `response.text()`: Lê o corpo como texto.
+    *   `response.blob()`: Lê o corpo como um objeto Blob (dados binários).
+    *   `response.formData()`: Lê o corpo como FormData.
+*   **Tratamento de Erros HTTP:** `fetch` só rejeita a Promise em caso de **falha de rede**. Respostas com status HTTP de erro (como 404 Not Found ou 500 Internal Server Error) **não** causam rejeição da Promise inicial. Você precisa verificar a propriedade `response.ok` (true para status 200-299) ou `response.status` manualmente dentro do `.then()` ou `try...catch`.
+
+[CODE_BLOCK lang="javascript" title="fetch_api.js"]
+// Exemplo: Buscar dados de uma API pública (JSONPlaceholder)
+const apiUrl = 'https://jsonplaceholder.typicode.com/posts/1'; // URL de um post específico
+
+console.log(`Buscando dados de: ${apiUrl}`);
+
+// Usando .then() e .catch()
+fetch(apiUrl) // Faz a requisição GET
+  .then(response => {
+    console.log("Recebeu resposta inicial. Status:", response.status);
+    // Verifica se a resposta foi bem-sucedida (status 2xx)
+    if (!response.ok) {
+      // Se não foi OK, lança um erro para ser pego pelo .catch()
+      throw new Error(`Erro HTTP! Status: ${response.status}`);
+    }
+    // Lê o corpo da resposta como JSON (retorna outra Promise)
+    return response.json();
+  })
+  .then(data => {
+    // Este .then() recebe os dados JSON parseados
+    console.log("Dados recebidos (JSON):", data);
+    console.log("Título do Post:", data.title);
+    // Usar os dados na página...
+  })
+  .catch(error => {
+    // Captura erros de rede ou o erro lançado no .then() anterior
+    console.error("Falha ao buscar dados:", error.message);
+    // Mostrar mensagem de erro ao usuário...
+  })
+  .finally(() => {
+      console.log("Requisição fetch (then/catch) finalizada.");
+  });
+
+// Exemplo com async/await (mais legível)
+async function buscarPost(postId) {
+    const url = `https://jsonplaceholder.typicode.com/posts/${postId}`;
+    console.log(`\nBuscando post ${postId} com async/await...`);
+    try {
+        const response = await fetch(url);
+        console.log(`Resposta inicial recebida (async). Status: ${response.status}`);
+
+        if (!response.ok) {
+            // Lança um erro que será pego pelo catch
+            throw new Error(`Erro HTTP (async)! Status: ${response.status}`);
+        }
+
+        const data = await response.json(); // Espera o corpo JSON ser lido
+        console.log(`Dados do post ${postId} (async):`, data);
+        return data; // Retorna os dados (a Promise da função resolve com isso)
+
+    } catch (error) {
+        console.error(`Falha ao buscar post ${postId} (async):`, error);
+        throw error; // Rejeita a Promise da função para quem chamou poder tratar
+    } finally {
+        console.log(`Busca do post ${postId} (async) finalizada.`);
+    }
+}
+
+// Chamando a função async
+buscarPost(2)
+    .then(post => console.log(`Título do post 2 (async): ${post.title}`))
+    .catch(err => console.log("Erro capturado fora da função async (ID 2).")); // Tratamento de erro
+
+// Chamando para um post que não existe (causará erro 404)
+buscarPost(99999)
+    .then(post => console.log(`Título do post 99999 (async): ${post.title}`)) // Não executa
+    .catch(err => console.log("Erro esperado para post inexistente (async) capturado."));
+[/CODE_BLOCK]
+
+Fetch API, Promises e `async/await` são ferramentas essenciais para criar aplicações web modernas que interagem com servidores e APIs externas.
+
+# 12. Exercício Prático
+
+Vamos consolidar alguns conceitos trabalhando com arrays e objetos.
+
+**Desafio:** Sistema Simples de Gerenciamento de Tarefas
+
+Crie um script JavaScript que simule um gerenciador de tarefas simples, operando sobre um array de objetos. Cada objeto representará uma tarefa e terá as propriedades: `id` (numérico), `descricao` (string) e `concluida` (boolean).
+
+**Requisitos:**
+
+1.  **Array Inicial:** Crie um array chamado `tarefas` com pelo menos 3 objetos de tarefa iniciais, algumas concluídas e outras não. Use IDs únicos para cada tarefa.
+2.  **Função `adicionarTarefa(descricao)`:**
+    *   Recebe uma `descricao` (string) como parâmetro.
+    *   Cria um novo objeto de tarefa com um `id` único (pode ser um contador simples ou baseado no tamanho atual do array + 1), a `descricao` fornecida e `concluida` como `false`.
+    *   Adiciona este novo objeto ao array `tarefas`.
+    *   Exibe no console a tarefa que foi adicionada.
+3.  **Função `marcarComoConcluida(id)`:**
+    *   Recebe um `id` de tarefa.
+    *   Encontra a tarefa no array `tarefas` com o `id` correspondente.
+    *   Se encontrar, muda a propriedade `concluida` dessa tarefa para `true`.
+    *   Exibe no console qual tarefa foi marcada como concluída ou uma mensagem se a tarefa não foi encontrada. (Dica: use o método `find` ou `findIndex` do array).
+4.  **Função `removerTarefa(id)`:**
+    *   Recebe um `id` de tarefa.
+    *   Remove a tarefa com o `id` correspondente do array `tarefas`. (Dica: use `findIndex` e `splice`, ou `filter` para criar um novo array sem a tarefa).
+    *   Exibe no console qual tarefa foi removida ou uma mensagem se não foi encontrada.
+5.  **Função `listarTarefasPendentes()`:**
+    *   Filtra o array `tarefas` para obter apenas as tarefas onde `concluida` é `false`.
+    *   Exibe no console a lista de descrições das tarefas pendentes ou uma mensagem se não houver nenhuma.
+6.  **Função `listarTodasTarefas()`:**
+    *   Percorre o array `tarefas`.
+    *   Exibe no console cada tarefa formatada, indicando seu ID, descrição e se está concluída ou não (ex: `[ ] Tarefa X (ID: 1)` ou `[X] Tarefa Y (ID: 2)`). (Dica: use `forEach`).
+7.  **Execução:** Chame as funções criadas para adicionar, marcar, remover e listar tarefas para demonstrar o funcionamento. Use `console.log` extensivamente para ver os resultados e o estado do array `tarefas` em diferentes momentos.
+
+[CODE_BLOCK lang="javascript" title="gerenciador_tarefas.js"]
+// --- Gerenciador de Tarefas Simples ---
+
+let tarefas = [
+  { id: 1, descricao: "Estudar JavaScript Promises", concluida: true },
+  { id: 2, descricao: "Fazer compras no supermercado", concluida: false },
+  { id: 3, descricao: "Ler documentação da Fetch API", concluida: false },
+];
+
+let proximoId = 4; // Para gerar IDs únicos simples
+
+// 2. Função para adicionar tarefa
+function adicionarTarefa(descricao) {
+  if (!descricao || typeof descricao !== 'string' || descricao.trim() === '') {
+      console.warn("Descrição inválida para adicionar tarefa.");
+      return;
+  }
+  const novaTarefa = {
+    id: proximoId++,
+    descricao: descricao.trim(),
+    concluida: false,
+  };
+  tarefas.push(novaTarefa);
+  console.log(`\n[+] Tarefa Adicionada: "${novaTarefa.descricao}" (ID: ${novaTarefa.id})`);
+}
+
+// 3. Função para marcar como concluída
+function marcarComoConcluida(id) {
+  const tarefa = tarefas.find(tarefa => tarefa.id === id); // Usando find
+
+  if (tarefa) {
+    if (!tarefa.concluida) {
+        tarefa.concluida = true;
+        console.log(`\n[V] Tarefa Marcada como Concluída: "${tarefa.descricao}" (ID: ${id})`);
+    } else {
+        console.log(`\n[!] Tarefa "${tarefa.descricao}" (ID: ${id}) já estava concluída.`);
+    }
+  } else {
+    console.warn(`\n[?] Tarefa com ID ${id} não encontrada para marcar como concluída.`);
+  }
+}
+
+// 4. Função para remover tarefa (usando filter)
+function removerTarefa(id) {
+  const tamanhoOriginal = tarefas.length;
+  const tarefaParaRemover = tarefas.find(t => t.id === id); // Apenas para log
+
+  tarefas = tarefas.filter(tarefa => tarefa.id !== id); // Cria novo array sem o item
+
+  if (tarefas.length < tamanhoOriginal) {
+    console.log(`\n[-] Tarefa Removida: "${tarefaParaRemover.descricao}" (ID: ${id})`);
+  } else {
+    console.warn(`\n[?] Tarefa com ID ${id} não encontrada para remover.`);
+  }
+}
+
+// 5. Função para listar tarefas pendentes
+function listarTarefasPendentes() {
+  console.log("\n--- Tarefas Pendentes ---");
+  const pendentes = tarefas.filter(tarefa => !tarefa.concluida);
+
+  if (pendentes.length === 0) {
+    console.log("Nenhuma tarefa pendente!");
+  } else {
+    pendentes.forEach(tarefa => {
+      console.log(`- ${tarefa.descricao} (ID: ${tarefa.id})`);
+    });
+  }
+}
+
+// 6. Função para listar todas as tarefas
+function listarTodasTarefas() {
+  console.log("\n--- Todas as Tarefas ---");
+  if (tarefas.length === 0) {
+      console.log("Nenhuma tarefa na lista.");
+      return;
+  }
+  tarefas.forEach(tarefa => {
+    const status = tarefa.concluida ? "[X]" : "[ ]";
+    console.log(`${status} ${tarefa.descricao} (ID: ${tarefa.id})`);
+  });
+}
+
+// 7. Execução e Demonstração
+console.log("--- Início da Execução ---");
+listarTodasTarefas();
+
+adicionarTarefa("   Preparar apresentação   ");
+adicionarTarefa("Pagar contas");
+
+listarTodasTarefas();
+listarTarefasPendentes();
+
+marcarComoConcluida(2);
+marcarComoConcluida(4);
+marcarComoConcluida(99); // ID inexistente
+
+listarTodasTarefas();
+listarTarefasPendentes();
+
+removerTarefa(1);
+removerTarefa(99); // ID inexistente
+
+listarTodasTarefas();
+console.log("\n--- Fim da Execução ---");
+[/CODE_BLOCK]
+
+# 13. Conclusão e Próximos Passos
+
+## Resumo dos principais conceitos abordados
+
+Parabéns por chegar até aqui! Nesta apostila, você explorou os conceitos fundamentais do JavaScript, a linguagem que dá vida à web:
+
+*   **O Básico:** Entendeu o que é JavaScript, como ele se encaixa com HTML/CSS e como adicioná-lo às suas páginas.
+*   **Fundamentos:** Aprendeu sobre variáveis (`var`, `let`, `const`), tipos de dados primitivos e de referência.
+*   **Operadores:** Viu como realizar operações matemáticas, de atribuição, comparação e lógicas.
+*   **Controle de Fluxo:** Dominou condicionais (`if`, `switch`) e laços (`for`, `while`, `do while`), além dos poderosos métodos de array (`forEach`, `map`, `filter`, `reduce`).
+*   **Funções:** Compreendeu como declarar e usar funções, incluindo funções anônimas, arrow functions e callbacks.
+*   **DOM:** Aprendeu a selecionar e manipular elementos HTML (conteúdo, estilo, classes).
+*   **Eventos:** Descobriu como tornar as páginas interativas respondendo a ações do usuário (`addEventListener`).
+*   **Estruturas de Dados:** Aprofundou-se na criação e manipulação de Arrays e Objetos.
+*   **Dados e Armazenamento:** Aprendeu a trabalhar com JSON e a armazenar dados no navegador com `localStorage` e `sessionStorage`.
+*   **Assincronismo:** Teve uma introdução crucial a Promises, `async/await` e à Fetch API para lidar com operações assíncronas e requisições de rede.
+
+## Introdução ao Projeto Html CSS e JS
+
+Com o conhecimento combinado de HTML, CSS e JavaScript, você agora tem a base necessária para criar projetos web front-end completos e interativos. O próximo passo natural é integrar essas três tecnologias em um projeto prático.
+
+**Ideia de Projeto:**
+
+*   **Página de Portfólio Interativa:** Crie uma página HTML estruturada, estilize-a com CSS (talvez usando Flexbox/Grid para layout e Media Queries para responsividade) e adicione JavaScript para:
+    *   Um "modo escuro/claro" que troca as classes CSS do `body` ou usa variáveis CSS.
+    *   Um filtro para projetos (ex: mostrar apenas projetos web ou de design clicando em botões).
+    *   Um formulário de contato com validação JavaScript antes do envio (pode apenas simular o envio ou usar um serviço como Formspree).
+    *   Talvez buscar dados de projetos de um arquivo JSON local usando `fetch`.
+*   **Aplicação To-Do List (Interface Gráfica):** Pegue o exercício prático do gerenciador de tarefas e crie uma interface HTML para ele. Use JavaScript para:
+    *   Ler o valor de um input para adicionar novas tarefas.
+    *   Listar as tarefas na página (criando elementos `<li>` dinamicamente).
+    *   Adicionar botões ou checkboxes para marcar tarefas como concluídas (atualizando a aparência com CSS/classes).
+    *   Adicionar um botão para remover tarefas.
+    *   (Opcional) Usar `localStorage` para salvar as tarefas e elas persistirem após fechar o navegador.
+
+## Exploração de frameworks como React e Vue.js
+
+Embora você possa criar aplicações web incríveis apenas com HTML, CSS e JavaScript "puro" (Vanilla JS), para projetos maiores e mais complexos, os **frameworks JavaScript** front-end se tornam extremamente úteis.
+
+*   **O que são?** São bibliotecas ou conjuntos de ferramentas que fornecem uma estrutura e abstrações para construir interfaces de usuário (UI). Eles ajudam a organizar o código, gerenciar o estado da aplicação, reutilizar componentes e otimizar o desempenho.
+*   **Exemplos Populares:**
+    *   **React:** Desenvolvido pelo Facebook, focado na criação de UIs baseadas em componentes. Possui um vasto ecossistema.
+    *   **Vue.js:** Conhecido por sua curva de aprendizado mais suave e excelente documentação. Também baseado em componentes.
+    *   **Angular:** Um framework mais completo (opiniativo) mantido pelo Google, que oferece uma solução mais integrada (incluindo roteamento, gerenciamento de estado, etc.).
+*   **Por que usar?** Eles simplificam a criação de SPAs (Single Page Applications), facilitam a manutenção do código, promovem a reutilização de componentes e geralmente lidam com otimizações de renderização do DOM.
+
+A base sólida de JavaScript que você construiu nesta apostila é **essencial** para aprender e trabalhar efetivamente com qualquer um desses frameworks.
+
+Continue praticando, construindo e explorando! O universo do desenvolvimento web é vasto e recompensador. Boa codificação!
