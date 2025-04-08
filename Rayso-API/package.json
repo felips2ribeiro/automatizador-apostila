@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/akashrchandran/Rayso-API/issues"
   },
-  "homepage": "https://github.com/akashrchandran/Rayso-API#readme"
+  "homepage": "https://github.com/akashrchandran/Rayso-API#readme",
+  "devDependencies": {
+    "patch-package": "^8.0.0"
+  }
 }

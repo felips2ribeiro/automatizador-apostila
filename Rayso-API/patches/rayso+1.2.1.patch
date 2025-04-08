@@ -1,0 +1,80 @@
+diff --git a/node_modules/rayso/src/entities/options.js b/node_modules/rayso/src/entities/options.js
+index 396270f..0f52e31 100644
+--- a/node_modules/rayso/src/entities/options.js
++++ b/node_modules/rayso/src/entities/options.js
+@@ -8,6 +8,7 @@
+  */
+ 
+ export const CardTheme = {
++  MINTLIFY : "mintlify",
+   VERCEL : "vercel",
+   SUPABASE: "supabase",
+   TAILWIND: "tailwind",
+diff --git a/node_modules/rayso/src/rayso.js b/node_modules/rayso/src/rayso.js
+index 6f5c511..c177906 100644
+--- a/node_modules/rayso/src/rayso.js
++++ b/node_modules/rayso/src/rayso.js
+@@ -20,12 +20,15 @@ import { InvalidParameterException } from './helpers/exceptions.js';
+ export class RaySo {
+     /**
+      * @param {Object} [options]
+-            Query parameters to be used to 
+-            construct the completed request.
++        Query parameters to be used to 
++        construct the completed request.
++        * @param {String} [options.width]
++            The width of the code snippet.
++            Default is '520px'  
+         * @param {String} [options.title]
+             The title of the code snippet.
+             Default is 'Untitled-1'.
+-        * @param {('breeze'|'candy'|'crimson'|'falcon'|'meadow'|'midnight'|'raindrop'|'sunset')} [options.theme]
++        * @param {('breeze'|'candy'|'crimson'|'falcon'|'meadow'|'midnight'|'raindrop'|'sunset'|'mintlify')} [options.theme]
+             The color scheme you want the
+             uploaded code to have.
+             Default is breeze.
+@@ -73,6 +76,7 @@ export class RaySo {
+             Default is false.
+     */
+     constructor({
++        width = '',
+         title = '',
+         theme = CardTheme.BREEZE,
+         background = true,
+@@ -83,6 +87,7 @@ export class RaySo {
+         localPreviewPath = '',
+         debug = false,
+     } = {}) {
++        this.width = width
+         this.title = title
+         this.theme = theme
+         this.background = background
+@@ -103,6 +108,7 @@ export class RaySo {
+     async cook(code) {
+         try {
+             const parametersValidation = this.validateParameters({
++                width: this.width,
+                 title: this.title,
+                 theme: this.theme,
+                 background: this.background,
+@@ -280,7 +286,9 @@ export class RaySo {
+             )}&theme=${this.theme}&padding=${this.padding}&background=${this.background
+                 }&darkMode=${this.darkMode}&code=${encodeURIComponent(
+                     this.stringToBase64(code)
+-                )}&language=${encodeURIComponent(this.language)}`
++                )}&language=${encodeURIComponent(this.language)}
++                &width=${encodeURIComponent(this.width)}
++                `
+         } catch (err) {
+             console.error(err)
+         }
+@@ -314,6 +322,9 @@ export class RaySo {
+             const paddings = Object.values(CardPadding)
+             const languages = Object.values(CardProgrammingLanguage)
+ 
++            if (typeof params.width !== 'string')
++                errors.push('Width parameter must be type of string')
++
+             if (typeof params.title !== 'string')
+                 errors.push('Title parameter must be type of string.')
+ 
